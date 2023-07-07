@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "94214445383",
+    "project_id": "bus-tracker-21f71",
+    "storage_bucket": "bus-tracker-21f71.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:94214445383:android:6a975e306c9a4eb9981462",
+        "android_client_info": {
+          "package_name": "com.example.google_maps_in_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "94214445383-bo7nqcrvitgigrhc4vgd7aqogptkd9lg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB40EtEMY3vbmq6xMfN7cgL7r1IVVT-gmc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "94214445383-bo7nqcrvitgigrhc4vgd7aqogptkd9lg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
