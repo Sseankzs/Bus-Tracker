@@ -62,8 +62,11 @@ class _MyAppState extends State<MyApp> {
       });
 
       // Start listening, including update to firebase
-      positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) async {
-        ref = FirebaseDatabase.instance.ref("route$currentTrackingRoute/bus$currentTrackingBus");
+      positionStream =
+          Geolocator.getPositionStream(locationSettings: locationSettings)
+              .listen((Position? position) async {
+        ref = FirebaseDatabase.instance
+            .ref("route$currentTrackingRoute/bus$currentTrackingBus");
         await ref?.update({
           'lat': position?.latitude,
           'long': position?.longitude,
@@ -94,10 +97,15 @@ class _MyAppState extends State<MyApp> {
         body: Center(
             child: Column(
           children: [
-            Text(currentTrackingRoute == null ? "Track Status: Not Tracking" : "Track Status: Tracking on Route $currentTrackingRoute Bus $currentTrackingBus"),
-            FilledButton(onPressed: () => track(1), child: const Text("Route 1")),
-            FilledButton(onPressed: () => track(2), child: const Text("Route 2")),
-            FilledButton(onPressed: () => track(3), child: const Text("Route 3")),
+            Text(currentTrackingRoute == null
+                ? "Track Status: Not Tracking"
+                : "Track Status: Tracking on Route $currentTrackingRoute Bus $currentTrackingBus"),
+            FilledButton(
+                onPressed: () => track(1), child: const Text("Route 1")),
+            FilledButton(
+                onPressed: () => track(2), child: const Text("Route 2")),
+            FilledButton(
+                onPressed: () => track(3), child: const Text("Route 3")),
           ],
         )),
       ),
