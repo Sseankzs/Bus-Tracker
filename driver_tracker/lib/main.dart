@@ -49,34 +49,34 @@ class _MyAppState extends State<MyApp> {
   }
 
   void track(int route) {
-    if (currentTrackingRoute != null) {
+    if (route == currentTrackingRoute) {
       setState(() {
         currentTrackingRoute = null;
       });
-
-      // Stop listening, including stop update to firebase
-      positionStream?.cancel();
-    } else {
-      setState(() {
-        currentTrackingRoute = route;
-      });
-
-      // Start listening, including update to firebase
-      positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) async {
-        ref = FirebaseDatabase.instance.ref("route$currentTrackingRoute/bus$currentTrackingBus");
-        await ref?.update({
-          'lat': position?.latitude,
-          'long': position?.longitude,
-          'speed': position?.speed,
-          'heading': position?.heading,
-          'accuracy': position?.accuracy,
-          'altitude': position?.altitude,
-        });
-        debugPrint(position == null
-            ? 'Unknown data on $currentTrackingRoute'
-            : '$currentTrackingRoute : ${position.latitude.toString()}, ${position.longitude.toString()}');
-      });
+      if (positionStream != null) positionStream?.cancel();
+      return;
     }
+    currentTrackingRoute = null;
+    if (positionStream != null) positionStream?.cancel();
+
+    setState(() {
+      currentTrackingRoute = route;
+    });
+
+    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) async {
+      ref = FirebaseDatabase.instance.ref("route$currentTrackingRoute/bus$currentTrackingBus");
+      await ref?.update({
+        'lat': position?.latitude,
+        'long': position?.longitude,
+        'speed': position?.speed,
+        'heading': position?.heading,
+        'accuracy': position?.accuracy,
+        'altitude': position?.altitude,
+      });
+      debugPrint(position == null
+          ? 'Unknown data on $currentTrackingRoute'
+          : '$currentTrackingRoute : ${position.latitude.toString()}, ${position.longitude.toString()}');
+    });
   }
 
   @override
@@ -87,17 +87,37 @@ class _MyAppState extends State<MyApp> {
         colorSchemeSeed: Colors.blue,
       ),
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Driver Tracker'),
-          elevation: 2,
-        ),
         body: Center(
             child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(currentTrackingRoute == null ? "Track Status: Not Tracking" : "Track Status: Tracking on Route $currentTrackingRoute Bus $currentTrackingBus"),
-            FilledButton(onPressed: () => track(1), child: const Text("Route 1")),
-            FilledButton(onPressed: () => track(2), child: const Text("Route 2")),
-            FilledButton(onPressed: () => track(3), child: const Text("Route 3")),
+            Image.asset('assets/UTP-logo2.png', height: 100),
+            const SizedBox(height: 10),
+            Text(
+              currentTrackingRoute == null ? "Track Status: Not Tracking" : "Track Status: Tracking on Route $currentTrackingRoute Bus $currentTrackingBus",
+              style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            FilledButton(
+                onPressed: () => track(1),
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text("Route 1", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                )),
+            const SizedBox(height: 10),
+            FilledButton(
+                onPressed: () => track(2),
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text("Route 2", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                )),
+            const SizedBox(height: 10),
+            FilledButton(
+                onPressed: () => track(3),
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text("Route 3", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                )),
           ],
         )),
       ),
