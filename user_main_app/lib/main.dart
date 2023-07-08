@@ -5,7 +5,6 @@ import 'firebase_options.dart';
 import 'package:user/bus_track.dart';
 import 'package:user/eta.dart';
 import 'package:user/schedule.dart';
-import 'package:geolocator/geolocator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

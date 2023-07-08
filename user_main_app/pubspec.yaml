@@ -46,12 +46,7 @@ dependencies:
   url_launcher: ^6.1.2
   geolocator: ^9.0.2
   http: ^1.1.0
-
-  firebase_core: ^2.14.0
-  google_maps_flutter_web: ^0.5.1
-  url_launcher: ^6.1.2
-  geolocator: ^9.0.2
-  http: ^1.1.0
+  full_screen_image: ^2.0.0
 
 dev_dependencies:
   flutter_test:

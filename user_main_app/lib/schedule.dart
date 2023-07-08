@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:full_screen_image/full_screen_image.dart';
 import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
 
 class Schedule extends StatelessWidget {
@@ -52,7 +53,7 @@ class Schedule extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // First Image Container________________________________
+              // First Image Container________________________________  
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,7 +61,7 @@ class Schedule extends StatelessWidget {
                   const Row(
                     children: [
                       Text('        '),
-                      Text('Shuttle Bus to Station 18',
+                      Text('Internal Shuttle Bus',
                           style: TextStyle(
                               color: Color.fromARGB(150, 0, 0, 0),
                               fontFamily: 'Poppins',
@@ -74,46 +75,46 @@ class Schedule extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(10, 5, 10, 20),
                       child: Column(
                         children: [
-                          InkWell(
-                            borderRadius: BorderRadius.circular(10),
-                            focusColor: Colors.white,
-                            onTap: () {
-                              //Set Action
-                            },
-                            child: Card(
-                              child: Container(
-                                  width: 500,
-                                  height: 130,
-                                  padding:
-                                      const EdgeInsets.fromLTRB(5, 5, 5, 5),
-                                  decoration: ShapeDecoration(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
+                          Container(
+                              width: 500,
+                              height: 220,
+                              padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                              decoration: ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                shadows: const [
+                                  BoxShadow(
+                                      color: Colors.grey,
+                                      blurRadius: 4,
+                                      offset: Offset(0, 4)),
+                                ],
+                                color: Colors.white,
+                              ),
+                              child: FullScreenWidget(
+                                disposeLevel: DisposeLevel.Medium,
+                                child: Center(
+                                  child: Hero(
+                                    tag: "smallImage",
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: ZoomOverlay(
+                                        modalBarrierColor: Colors.black12,
+                                        minScale: 0.5,
+                                        maxScale: 3.0,
+                                        animationCurve: Curves
+                                            .fastOutSlowIn, // Defaults to fastOutSlowIn which mimics IOS instagram behavior
+                                        animationDuration: const Duration(
+                                            milliseconds:
+                                                50), // Defaults to 100 Milliseconds. Recommended duration is 300 milliseconds for Curves.fastOutSlowIn
+                                        twoTouchOnly: true, // Defaults to false
+                                        child: Image.asset(
+                                            'images/UTP_Bus Schedule_Internal.png'),
+                                      ),
                                     ),
-                                    shadows: const [
-                                      BoxShadow(
-                                          color: Colors.grey,
-                                          blurRadius: 4,
-                                          offset: Offset(0, 4)),
-                                    ],
-                                    color: Colors.white,
                                   ),
-                                  child: ZoomOverlay(
-                                    modalBarrierColor:
-                                        Colors.black12,
-                                    minScale: 0.5,
-                                    maxScale: 3.0,
-                                    animationCurve: Curves
-                                        .fastOutSlowIn, // Defaults to fastOutSlowIn which mimics IOS instagram behavior
-                                    animationDuration: const Duration(
-                                        milliseconds:
-                                            50), // Defaults to 100 Milliseconds. Recommended duration is 300 milliseconds for Curves.fastOutSlowIn
-                                    twoTouchOnly: true, // Defaults to false
-                                    child: Image.asset(
-                                        'images/UTP_Bus Schedule_Shuttle Bus to Stn 18.png'),
-                                  )),
-                            ),
-                          ),
+                                ),
+                              )),
                         ],
                       ),
                     ),
@@ -129,7 +130,7 @@ class Schedule extends StatelessWidget {
                   const Row(
                     children: [
                       Text('        '),
-                      Text('External Bus',
+                      Text('External Shuttle Bus (Seri Iskandar)',
                           style: TextStyle(
                               color: Color.fromARGB(150, 0, 0, 0),
                               fontFamily: 'Poppins',
@@ -143,46 +144,46 @@ class Schedule extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(10, 5, 10, 20),
                       child: Column(
                         children: [
-                          InkWell(
-                            borderRadius: BorderRadius.circular(10),
-                            focusColor: Colors.white,
-                            onTap: () {
-                              //Set Action
-                            },
-                            child: Card(
-                              child: Container(
-                                  width: 500,
-                                  height: 230,
-                                  padding:
-                                      const EdgeInsets.fromLTRB(5, 5, 5, 5),
-                                  decoration: ShapeDecoration(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
+                          Container(
+                              width: 500,
+                              height: 270,
+                              padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                              decoration: ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                shadows: const [
+                                  BoxShadow(
+                                      color: Colors.grey,
+                                      blurRadius: 4,
+                                      offset: Offset(0, 4)),
+                                ],
+                                color: Colors.white,
+                              ),
+                              child: FullScreenWidget(
+                                disposeLevel: DisposeLevel.Medium,
+                                child: Center(
+                                  child: Hero(
+                                    tag: "smallImage",
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: ZoomOverlay(
+                                        modalBarrierColor: Colors.black12,
+                                        minScale: 0.5,
+                                        maxScale: 3.0,
+                                        animationCurve: Curves
+                                            .fastOutSlowIn, // Defaults to fastOutSlowIn which mimics IOS instagram behavior
+                                        animationDuration: const Duration(
+                                            milliseconds:
+                                                50), // Defaults to 100 Milliseconds. Recommended duration is 300 milliseconds for Curves.fastOutSlowIn
+                                        twoTouchOnly: true, // Defaults to false
+                                        child: Image.asset(
+                                            'images/UTP_Bus Schedule_External.png'),
+                                      ),
                                     ),
-                                    shadows: const [
-                                      BoxShadow(
-                                          color: Colors.grey,
-                                          blurRadius: 4,
-                                          offset: Offset(0, 4)),
-                                    ],
-                                    color: Colors.white,
                                   ),
-                                  child: ZoomOverlay(
-                                    modalBarrierColor:
-                                        Colors.black12, 
-                                    minScale: 0.5, 
-                                    maxScale: 3.0, 
-                                    animationCurve: Curves
-                                        .fastOutSlowIn, // Defaults to fastOutSlowIn which mimics IOS instagram behavior
-                                    animationDuration: const Duration(
-                                        milliseconds:
-                                            50), // Defaults to 100 Milliseconds. Recommended duration is 300 milliseconds for Curves.fastOutSlowIn
-                                    twoTouchOnly: true, // Defaults to false
-                                    child: Image.asset(
-                                        'images/UTP_Bus Schedule_External.png'),
-                                  )),
-                            ),
-                          ),
+                                ),
+                              )),
                         ],
                       ),
                     ),
@@ -198,7 +199,7 @@ class Schedule extends StatelessWidget {
                   const Row(
                     children: [
                       Text('        '),
-                      Text('Internal Bus',
+                      Text('External Shuttle Bus (Stn 18)',
                           style: TextStyle(
                               color: Color.fromARGB(150, 0, 0, 0),
                               fontFamily: 'Poppins',
@@ -212,46 +213,46 @@ class Schedule extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(10, 5, 10, 20),
                       child: Column(
                         children: [
-                          InkWell(
-                            borderRadius: BorderRadius.circular(10),
-                            focusColor: Colors.white,
-                            onTap: () {
-                              //Set Action
-                            },
-                            child: Card(
-                              child: Container(
-                                  width: 500,
-                                  height: 190,
-                                  padding:
-                                      const EdgeInsets.fromLTRB(5, 5, 5, 5),
-                                  decoration: ShapeDecoration(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
+                          Container(
+                              width: 500,
+                              height: 155,
+                              padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                              decoration: ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                shadows: const [
+                                  BoxShadow(
+                                      color: Colors.grey,
+                                      blurRadius: 4,
+                                      offset: Offset(0, 4)),
+                                ],
+                                color: Colors.white,
+                              ),
+                              child: FullScreenWidget(
+                                disposeLevel: DisposeLevel.Medium,
+                                child: Center(
+                                  child: Hero(
+                                    tag: "smallImage",
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: ZoomOverlay(
+                                        modalBarrierColor: Colors.black12,
+                                        minScale: 0.5,
+                                        maxScale: 3.0,
+                                        animationCurve: Curves
+                                            .fastOutSlowIn, // Defaults to fastOutSlowIn which mimics IOS instagram behavior
+                                        animationDuration: const Duration(
+                                            milliseconds:
+                                                50), // Defaults to 100 Milliseconds. Recommended duration is 300 milliseconds for Curves.fastOutSlowIn
+                                        twoTouchOnly: true, // Defaults to false
+                                        child: Image.asset(
+                                            'images/UTP_Bus Schedule_Shuttle Bus to Stn 18.png'),
+                                      ),
                                     ),
-                                    shadows: const [
-                                      BoxShadow(
-                                          color: Colors.grey,
-                                          blurRadius: 4,
-                                          offset: Offset(0, 4)),
-                                    ],
-                                    color: Colors.white,
                                   ),
-                                  child: ZoomOverlay(
-                                    modalBarrierColor:
-                                        Colors.black12,
-                                    minScale: 0.5,
-                                    maxScale: 3.0,
-                                    animationCurve: Curves
-                                        .fastOutSlowIn, // Defaults to fastOutSlowIn which mimics IOS instagram behavior
-                                    animationDuration: const Duration(
-                                        milliseconds:
-                                            50), // Defaults to 100 Milliseconds. Recommended duration is 300 milliseconds for Curves.fastOutSlowIn
-                                    twoTouchOnly: true, // Defaults to false
-                                    child: Image.asset(
-                                        'images/UTP_Bus Schedule_Internal.png'),
-                                  )),
-                            ),
-                          ),
+                                ),
+                              )),
                         ],
                       ),
                     ),

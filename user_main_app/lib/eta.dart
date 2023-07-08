@@ -7,7 +7,8 @@ class ETA extends StatelessWidget {
   Widget build(
     BuildContext context,
   ) {
-    return LayoutBuilder(builder: (BuildContext context, BoxConstraints viewportConstraints) {
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints viewportConstraints) {
       return SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(
@@ -52,6 +53,11 @@ class ETA extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(0, 2, 0, 5),
                       child: const Text(
                         'This page displays updated status of each route',
+                        style: TextStyle(
+                            color: Color.fromARGB(60, 0, 0, 0),
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.normal,
+                            fontSize: 10),
                       ),
                     ),
 
@@ -92,7 +98,10 @@ class ETA extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             shadows: const [
-                              BoxShadow(color: Colors.grey, blurRadius: 4, offset: Offset(0, 4)),
+                              BoxShadow(
+                                  color: Colors.grey,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 4)),
                             ],
                             color: Colors.white,
                           ),
@@ -114,7 +123,8 @@ class ETA extends StatelessWidget {
                                   alignment: Alignment.centerRight,
                                   child: const Text(
                                     '00:00PM',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -142,7 +152,10 @@ class ETA extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             shadows: const [
-                              BoxShadow(color: Colors.grey, blurRadius: 4, offset: Offset(0, 4)),
+                              BoxShadow(
+                                  color: Colors.grey,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 4)),
                             ],
                             color: Colors.white,
                           ),
@@ -164,7 +177,8 @@ class ETA extends StatelessWidget {
                                   alignment: Alignment.centerRight,
                                   child: const Text(
                                     '00:00PM',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -192,7 +206,10 @@ class ETA extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             shadows: const [
-                              BoxShadow(color: Colors.grey, blurRadius: 4, offset: Offset(0, 4)),
+                              BoxShadow(
+                                  color: Colors.grey,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 4)),
                             ],
                             color: Colors.white,
                           ),
@@ -214,7 +231,8 @@ class ETA extends StatelessWidget {
                                   alignment: Alignment.centerRight,
                                   child: const Text(
                                     '00:00PM',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
