@@ -1,10 +1,47 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:user/internal_route.dart';
 import 'package:user/ipoh.dart';
 import 'package:user/si_route.dart';
 
-class ETA extends StatelessWidget {
+class ETA extends StatefulWidget {
   const ETA({super.key});
+
+  @override
+  State<ETA> createState() => _ETAState();
+}
+
+class _ETAState extends State<ETA> {
+  int nextStopNum = 0;
+  String nextStop = '-';
+  final _database = FirebaseDatabase.instance.ref();
+
+  @override
+  void initState() {
+    super.initState();
+    _activateListeners();
+  }
+
+  void _activateListeners() {
+    _database.child('route1/bus1/nextStop').onValue.listen(
+      (event) {
+        final int nextStopNum = event.snapshot.value as int;
+        setState(
+          () {
+            if (nextStopNum == 0) {
+              nextStop = 'PMMD';
+            } else if (nextStopNum == 1) {
+              nextStop = 'An-Nur Mosque';
+            } else if (nextStopNum == 2) {
+              nextStop = 'Chancellor Complex';
+            } else if (nextStopNum == 3) {
+              nextStop = 'R&D';
+            }
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,19 +154,19 @@ class ETA extends StatelessWidget {
                             ],
                             color: Colors.white,
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.circle_rounded,
                                 size: 12,
                                 color: Colors.red,
                               ),
                               Text(
-                                'Next Stop: ',
+                                'Next Stop: $nextStop',
                                 textAlign: TextAlign.left,
                               ),
-                              SizedBox(width: 140),
-                              Text(
+                              const SizedBox(width: 140),
+                              const Text(
                                 'ETA - 00:00PM',
                                 textAlign: TextAlign.left,
                                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -189,19 +226,19 @@ class ETA extends StatelessWidget {
                           ],
                           color: Colors.white,
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.circle_rounded,
                               size: 12,
                               color: Colors.red,
                             ),
                             Text(
-                              'Next Stop: ',
+                              'Next Stop: $nextStop',
                               textAlign: TextAlign.left,
                             ),
-                            SizedBox(width: 140),
-                            Text(
+                            const SizedBox(width: 140),
+                            const Text(
                               'ETA - 00:00PM',
                               textAlign: TextAlign.left,
                               style: TextStyle(fontWeight: FontWeight.bold),
@@ -260,19 +297,19 @@ class ETA extends StatelessWidget {
                           ],
                           color: Colors.white,
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.circle_rounded,
                               size: 12,
                               color: Colors.red,
                             ),
                             Text(
-                              'Next Stop: ',
+                              'Next Stop: $nextStop',
                               textAlign: TextAlign.left,
                             ),
-                            SizedBox(width: 140),
-                            Text(
+                            const SizedBox(width: 140),
+                            const Text(
                               'ETA - 00:00PM',
                               textAlign: TextAlign.left,
                               style: TextStyle(fontWeight: FontWeight.bold),
