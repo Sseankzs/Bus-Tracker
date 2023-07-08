@@ -1,8 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:user/internal_route.dart';
-import 'package:user/ipoh.dart';
-import 'package:user/si_route.dart';
 
 class ETA extends StatefulWidget {
   const ETA({super.key});

@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import 'package:firebase_database/firebase_database.dart';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'firebase_options.dart';
 
 import 'package:geolocator/geolocator.dart';
@@ -21,33 +21,6 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-Future<Position> _getCurrentLocation() async {
-  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    return Future.error("Location services are disabled");
-  }
-  LocationPermission permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      return Future.error("Location Permissions are denied");
-    }
-  }
-  if (permission == LocationPermission.deniedForever) {
-    return Future.error("Location permission are permanenetly disabled");
-  }
-  return await Geolocator.getCurrentPosition();
-}
-
-Future<void> _openMap(String lat, String long) async {
-  String googleURL =
-      "https://www.google.com/maps/search/?api=1&query=$lat,$long";
-  await canLaunchUrlString(googleURL)
-      ? await launchUrlString(googleURL)
-      : throw "Could not launch $googleURL";
-      
-}
-
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -56,17 +29,28 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late GoogleMapController mapController;
-  final LatLng _center = const LatLng(45.521563, -122.677433);
-  late String lat;
-  late String long;
-  String locationMessage = 'Current Location of the User';
-
   FirebaseDatabase database = FirebaseDatabase.instance;
   DatabaseReference? ref;
 
+  // Variables for tracking
   int? currentTrackingRoute;
   int? currentTrackingBus = 1;
+  int? currentTrackingSchedule = 1;
+  List<dynamic>? scheduleData;
+  int? currentStop = 0;
+  Map? currentStopData = {
+    "name": null,
+    "lat": 0.0,
+    "long": 0.0,
+  };
+  int? nextStop = 1;
+  Map? nextStopData = {
+    "name": null,
+    "lat": 0.0,
+    "long": 0.0,
+  };
+  int? duration = 0;
+  int? distance = 0;
 
   static const LocationSettings locationSettings = LocationSettings(
     accuracy: LocationAccuracy.high,
@@ -75,50 +59,184 @@ class _MyAppState extends State<MyApp> {
 
   StreamSubscription<Position>? positionStream;
 
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
+  void stopTrack() {
+    setState(() {
+      currentTrackingRoute = null;
+      currentTrackingBus = 1;
+      currentTrackingSchedule = 1;
+      currentStop = 0;
+      currentStopData = {
+        "name": null,
+        "lat": 0.0,
+        "long": 0.0,
+      };
+      nextStop = 1;
+      nextStopData = {
+        "name": null,
+        "lat": 0.0,
+        "long": 0.0,
+      };
+      duration = 0;
+      distance = 0;
+      scheduleData = null;
+      if (positionStream != null) positionStream?.cancel();
+    });
+    if (positionStream != null) positionStream?.cancel();
+    ref?.child("bus$currentTrackingBus").update({
+      'operation': false,
+    });
+    return;
   }
 
-  void track(int route) {
-    if (route == currentTrackingRoute) {
-      setState(() {
-        currentTrackingRoute = null;
-      });
-      if (positionStream != null) positionStream?.cancel();
+  void track(int route) async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
       return;
     }
-    currentTrackingRoute = null;
-    if (positionStream != null) positionStream?.cancel();
+    LocationPermission permission = await Geolocator.checkPermission();
+    while (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+    }
+    // Reset previous route
+    if (route == currentTrackingRoute) {
+      stopTrack();
+      return;
+    }
+
+    stopTrack();
 
     setState(() {
       currentTrackingRoute = route;
+      ref = FirebaseDatabase.instance.ref('route$currentTrackingRoute');
     });
 
-    positionStream =
-        Geolocator.getPositionStream(locationSettings: locationSettings)
-            .listen((Position? position) async {
-      ref = FirebaseDatabase.instance
-          .ref("route$currentTrackingRoute/bus$currentTrackingBus");
-      await ref?.update({
-        'lat': position?.latitude,
-        'long': position?.longitude,
-        'speed': position?.speed,
-        'heading': position?.heading,
-        'accuracy': position?.accuracy,
-        'altitude': position?.altitude,
+    // Start tracking
+    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) async {
+      if (scheduleData == null) {
+        var retrieve = await ref!.child('schedule$currentTrackingSchedule').get();
+        setState(() {
+          scheduleData = retrieve.value as List<dynamic>;
+        });
+        await ref?.child("bus$currentTrackingBus").update({
+          'operation': true,
+        });
+      }
+      //debugPrint(scheduleData.toString());
+
+      // retrieve data from firebase
+      if (currentStopData?["name"] == null) {
+        currentStopData?["name"] = scheduleData![currentStop!.toInt()]['name'];
+        currentStopData?["lat"] = scheduleData![currentStop!.toInt()]['lat'];
+        currentStopData?["long"] = scheduleData![currentStop!.toInt()]['long'];
+      }
+
+      // next stop calculation
+      if (nextStopData?["name"] == null) {
+        nextStopData?["name"] = scheduleData![nextStop!.toInt()]['name'];
+        nextStopData?["lat"] = scheduleData![nextStop!.toInt()]['lat'];
+        nextStopData?["long"] = scheduleData![nextStop!.toInt()]['long'];
+      }
+
+      //debugPrint(currentStopData?.toString());
+      //debugPrint(nextStopData?.toString());
+
+      http.Response response = await http.post(
+        Uri.parse('https://routes.googleapis.com/directions/v2:computeRoutes'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': 'AIzaSyAPCuddVW7ch26c7zek493XKjRz4bnkKoc',
+          'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters',
+        },
+        body: '''{
+          "origin":{
+            "location":{
+              "latLng":{
+                "latitude": ${position?.latitude},
+                "longitude": ${position?.longitude}
+              }
+            }
+          },
+          "destination":{
+            "location":{
+              "latLng":{
+                "latitude": ${nextStopData?["lat"]},
+                "longitude": ${nextStopData?["long"]}
+              }
+            }
+          },
+          "travelMode": "DRIVE"
+        }''',
+      );
+
+      //debugPrint("Route API: ${response.statusCode}");
+      //debugPrint("Route API: ${response.body}");
+
+      var responseBody = jsonDecode(response.body);
+
+      setState(() {
+        distance = responseBody['routes'][0]['distanceMeters'];
+        duration = int.parse(responseBody['routes'][0]['duration'].replaceAll(RegExp('[^0-9]'), ''));
       });
-      debugPrint(position == null
-          ? 'Unknown data on $currentTrackingRoute'
-          : '$currentTrackingRoute : ${position.latitude.toString()}, ${position.longitude.toString()}');
+
+      // check if bus has reached next stop
+      double p1 = position?.latitude as double;
+      double p2 = position?.longitude as double;
+      double p3 = nextStopData?["lat"] as double;
+      double p4 = nextStopData?["long"] as double;
+      double distanceInMeters = Geolocator.distanceBetween(p1, p2, p3, p4);
+      debugPrint("Geolocator: $distanceInMeters");
+      if (distance == null || duration == null) {
+        distance = 0;
+        duration = 0;
+      }
+
+      if (distanceInMeters < (50 + (position!.speed / 100 * 25)) ||
+          distance! < (50 + (position.speed / 100 * 25)) ||
+          duration! < (10 + (position.speed / 100 * 10))) {
+        currentStop = nextStop;
+        nextStop = nextStop! + 1;
+
+        if (nextStop != scheduleData?.length) {
+          debugPrint("Stop reached, moving to next stop");
+          currentStopData = Map.from(nextStopData!);
+
+          nextStopData?["name"] = scheduleData![nextStop!.toInt()]['name'];
+          nextStopData?["lat"] = scheduleData![nextStop!.toInt()]['lat'];
+          nextStopData?["long"] = scheduleData![nextStop!.toInt()]['long'];
+        } else {
+          debugPrint("Last stop reached");
+          await ref?.child("bus$currentTrackingBus").update({
+            'operation': false,
+          });
+          stopTrack();
+        }
+        return;
+      }
+
+      // Update to firebase
+      await ref?.child("bus$currentTrackingBus").update({
+        'lat': position.latitude,
+        'long': position.longitude,
+        'speed': position.speed,
+        'heading': position.heading,
+        'accuracy': position.accuracy,
+        'altitude': position.altitude,
+        'timeStamp': position.timestamp.toString(),
+        'currentStop': currentStop,
+        'nextStop': nextStop,
+        'distance': distance,
+        'duration': duration,
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        colorSchemeSeed: Colors.blue,
+        colorSchemeSeed: const Color.fromARGB(255, 162, 123, 92),
       ),
       home: Scaffold(
         body: Center(
@@ -128,68 +246,50 @@ class _MyAppState extends State<MyApp> {
             Image.asset('assets/UTP-logo2.png', height: 100),
             const SizedBox(height: 10),
             Text(
-              currentTrackingRoute == null
-                  ? "Track Status: Not Tracking"
-                  : "Track Status: Tracking on Route $currentTrackingRoute Bus $currentTrackingBus",
-              style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold),
+              currentTrackingRoute == null ? "Track Status: Not Tracking" : "Track Status: Tracking on Route $currentTrackingRoute Bus $currentTrackingBus",
+              style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Current Stop: ${currentStopData?["name"]}",
+              style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Next Stop: ${nextStopData?["name"]}",
+              style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Estimated Duration: $duration s",
+              style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Estimated Distance: $distance m",
+              style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             FilledButton(
                 onPressed: () => track(1),
                 child: const Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Text("Route 1",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold)),
+                  child: Text("Route 1", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                 )),
             const SizedBox(height: 10),
             FilledButton(
                 onPressed: () => track(2),
                 child: const Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Text("Route 2",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold)),
+                  child: Text("Route 2", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                 )),
             const SizedBox(height: 10),
             FilledButton(
                 onPressed: () => track(3),
                 child: const Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Text("Route 3",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold)),
+                  child: Text("Route 3", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                 )),
-            const SizedBox(height: 10),
-            Text(locationMessage, textAlign: TextAlign.center),
-            const SizedBox(height: 10),
-            FilledButton(
-              onPressed: () {
-                _getCurrentLocation().then((value) {
-                  lat = '${value.latitude}';
-                  long = '${value.longitude}';
-                  setState(() {
-                    locationMessage = 'Latitude:$lat, Longitude $long';
-                  });
-                });
-              },
-              child: const Text("Get Current Location"),
-            ),
-            const SizedBox(height: 10),
-            FilledButton(
-                onPressed: () {
-                  _openMap(lat, long);
-                },
-                child: const Text("Open Map"))
           ],
         )),
       ),
