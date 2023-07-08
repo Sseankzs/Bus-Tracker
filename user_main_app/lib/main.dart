@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:user/bus_track.dart';
 import 'package:user/eta.dart';
 import 'package:user/map.dart';
 import 'package:user/schedule.dart';
@@ -35,7 +36,7 @@ class _LogInState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: const [ETA(), MapPage(), Schedule()][currentpage],
+      body: const [ETA(), BusTrack(), Schedule()][currentpage],
       bottomNavigationBar: NavigationBar(
         backgroundColor: const Color.fromRGBO(220, 215, 201, 1),
         animationDuration: const Duration(milliseconds: 500),
