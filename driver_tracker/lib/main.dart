@@ -49,24 +49,23 @@ class _MyAppState extends State<MyApp> {
   }
 
   void track(int route) {
-    if (currentTrackingRoute != null) {
+    if (route == currentTrackingRoute) {
       setState(() {
         currentTrackingRoute = null;
       });
+      if (positionStream != null) positionStream?.cancel();
+      return;
+    }
+    currentTrackingRoute = null;
+    if (positionStream != null) positionStream?.cancel();
 
-      // Stop listening, including stop update to firebase
-      positionStream?.cancel();
-    } else {
-      setState(() {
-        currentTrackingRoute = route;
-      });
+    setState(() {
+      currentTrackingRoute = route;
+    });
 
       // Start listening, including update to firebase
-      positionStream =
-          Geolocator.getPositionStream(locationSettings: locationSettings)
-              .listen((Position? position) async {
-        ref = FirebaseDatabase.instance
-            .ref("route$currentTrackingRoute/bus$currentTrackingBus");
+      positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) async {
+        ref = FirebaseDatabase.instance.ref("route$currentTrackingRoute/bus$currentTrackingBus");
         await ref?.update({
           'lat': position?.latitude,
           'long': position?.longitude,
@@ -90,22 +89,14 @@ class _MyAppState extends State<MyApp> {
         colorSchemeSeed: Colors.blue,
       ),
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Driver Tracker'),
-          elevation: 2,
-        ),
         body: Center(
             child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(currentTrackingRoute == null
-                ? "Track Status: Not Tracking"
-                : "Track Status: Tracking on Route $currentTrackingRoute Bus $currentTrackingBus"),
-            FilledButton(
-                onPressed: () => track(1), child: const Text("Route 1")),
-            FilledButton(
-                onPressed: () => track(2), child: const Text("Route 2")),
-            FilledButton(
-                onPressed: () => track(3), child: const Text("Route 3")),
+            Text(currentTrackingRoute == null ? "Track Status: Not Tracking" : "Track Status: Tracking on Route $currentTrackingRoute Bus $currentTrackingBus"),
+            FilledButton(onPressed: () => track(1), child: const Text("Route 1")),
+            FilledButton(onPressed: () => track(2), child: const Text("Route 2")),
+            FilledButton(onPressed: () => track(3), child: const Text("Route 3")),
           ],
         )),
       ),
