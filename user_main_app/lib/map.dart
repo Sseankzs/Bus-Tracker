@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_google_map_polyline_point/flutter_polyline_point.dart';
+import 'package:flutter_google_map_polyline_point/point_lat_lng.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:firebase_database/firebase_database.dart';
 
@@ -22,6 +25,7 @@ class _MapsState extends State<MapPage> {
 
   int? currentTrackingRoute;
   int? currentTrackingBus = 1;
+  int? currentTrackingSchedule = 1;
 
   double? latitude = 0.0;
   double? longitude = 0.0;
@@ -31,71 +35,8 @@ class _MapsState extends State<MapPage> {
     track(1);
   }
 
-  void track(int route) {
-    if (route == currentTrackingRoute) {
-      setState(() {
-        currentTrackingRoute = null;
-        positionStream?.cancel();
-      });
-      return;
-    }
-    setState(() {
-      currentTrackingRoute = route;
-    });
+  BitmapDescriptor busIcon = BitmapDescriptor.defaultMarker;
 
-    final ref = FirebaseDatabase.instance.ref('route$currentTrackingRoute/bus$currentTrackingBus');
-
-    positionStream = ref.onValue.listen((DatabaseEvent event) async {
-      final lat = await ref.child('lat').get();
-      if (lat.exists) {
-        debugPrint(lat.value.toString());
-      } else {
-        debugPrint('No data available.');
-      }
-      final long = await ref.child('long').get();
-      if (long.exists) {
-        debugPrint(long.value.toString());
-      } else {
-        debugPrint('No data available.');
-      }
-      setState(() {
-        latitude = double.parse(lat.value.toString());
-        longitude = double.parse(long.value.toString());
-      });
-    });
-  }
-
-  BitmapDescriptor? _markerIcon;
-
-  Marker _createMarker() {
-    if (_markerIcon != null) {
-      return Marker(
-        markerId: const MarkerId('marker_1'),
-        position: LatLng(latitude!, longitude!),
-        icon: _markerIcon!,
-      );
-    } else {
-      return Marker(
-        markerId: const MarkerId('marker_1'),
-        position: LatLng(latitude!, longitude!),
-      );
-    }
-  }
-
-  Future<void> _createMarkerImageFromAsset(BuildContext context) async {
-    if (_markerIcon == null) {
-      final ImageConfiguration imageConfiguration = createLocalImageConfiguration(context, size: const Size.square(8));
-      BitmapDescriptor.fromAssetImage(imageConfiguration, 'images/bus-32.png').then(_updateBitmap);
-    }
-  }
-
-  void _updateBitmap(BitmapDescriptor bitmap) {
-    setState(() {
-      _markerIcon = bitmap;
-    });
-  }
-
-  BitmapDescriptor markerIcon = BitmapDescriptor.defaultMarker;
   @override
   void initState() {
     addCustomIcon();
@@ -106,10 +47,115 @@ class _MapsState extends State<MapPage> {
     BitmapDescriptor.fromAssetImage(const ImageConfiguration(), "images/bus-32.png").then(
       (icon) {
         setState(() {
-          markerIcon = icon;
+          busIcon = icon;
         });
       },
     );
+  }
+
+  final Set<Polyline> _polyline = {};
+  final Set<Marker> _markers = {};
+
+  void track(int route) async {
+    setState(() {
+      currentTrackingRoute = route;
+      if (positionStream != null) positionStream?.cancel();
+      _polyline.clear();
+      _markers.clear();
+    });
+
+    final ref = FirebaseDatabase.instance.ref('route$currentTrackingRoute');
+
+    // get polyline data
+    final polyline = await ref.child('bus$currentTrackingBus/polyline').get();
+
+    // if polyline data exists
+    // decode polyline data into List<LatLng>
+    // add polyline to map
+    if (polyline.exists && _polyline.isEmpty) {
+      debugPrint(polyline.value.toString());
+      PolylinePoints polylinePoints = PolylinePoints();
+      List<PointLatLng> latlng = polylinePoints.decodePolyline(polyline.value.toString());
+      // convert List<PointLatLng> into List<LatLng>
+      List<LatLng> points = [];
+      for (var i = 0; i < latlng.length; i++) {
+        points.add(LatLng(latlng[i].latitude, latlng[i].longitude));
+      }
+
+      setState(() {
+        _polyline.clear();
+        _polyline.add(Polyline(
+          polylineId: const PolylineId('route'),
+          visible: true,
+          //latlng is List<LatLng>
+          points: points,
+          width: 5,
+          color: Colors.blue,
+        ));
+      });
+    } else {
+      debugPrint('No polyline data available.');
+    }
+
+    // add first marker
+    // get schedule data
+    var schedule = await ref.child('schedule$currentTrackingSchedule').get();
+    if (schedule.exists && _markers.isEmpty) {
+      if (schedule.value == null) return;
+
+      List<dynamic> scheduleData = schedule.value as List<dynamic>;
+
+      // iterate through schedule data
+      // add marker to map
+      for (var i = 0; i < scheduleData.length; i++) {
+        if (scheduleData[i] != null) {
+          _markers.add(Marker(
+            markerId: MarkerId("${scheduleData[i]['name']}"),
+            infoWindow: InfoWindow(title: "${scheduleData[i]['name']}"),
+            position: LatLng(scheduleData[i]['lat'], scheduleData[i]['long']),
+          ));
+        }
+      }
+
+      debugPrint(_markers.toString());
+
+      _markers.add(Marker(
+        markerId: const MarkerId("bus"),
+        position: LatLng(latitude!, longitude!),
+        icon: busIcon,
+      ));
+    } else {
+      debugPrint('No schedule data available.');
+    }
+
+    positionStream = ref.onValue.listen((DatabaseEvent event) async {
+      final lat = await ref.child('bus$currentTrackingBus/lat').get();
+      if (lat.exists) {
+        debugPrint(lat.value.toString());
+      } else {
+        debugPrint('No data available.');
+      }
+      final long = await ref.child('bus$currentTrackingBus/long').get();
+      if (long.exists) {
+        debugPrint(long.value.toString());
+      } else {
+        debugPrint('No data available.');
+      }
+      setState(() {
+        if (lat.value != null && long.value != null) {
+          latitude = double.parse(lat.value.toString());
+          longitude = double.parse(long.value.toString());
+          if (_markers.isNotEmpty) {
+            _markers.remove(_markers.last);
+            _markers.add(Marker(
+              markerId: const MarkerId("bus"),
+              position: LatLng(latitude!, longitude!),
+              icon: busIcon,
+            ));
+          }
+        }
+      });
+    });
   }
 
   @override
@@ -118,20 +164,66 @@ class _MapsState extends State<MapPage> {
       CameraPosition currentLocation = CameraPosition(target: LatLng(latitude!, longitude!), zoom: 16);
       mapController.animateCamera(CameraUpdate.newCameraPosition(currentLocation));
     }
-    return GoogleMap(
-        onMapCreated: _onMapCreated,
-        markers: {
-          Marker(
-            markerId: const MarkerId("marker1"),
-            position: LatLng(latitude!, longitude!),
-            icon: markerIcon,
+    return Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          foregroundColor: const Color.fromARGB(255, 0, 0, 0),
+          elevation: 5.0,
+          title: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text('BUS', style: TextStyle(color: Colors.black, fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 22)),
+              Text(' ', style: TextStyle(color: Colors.black, fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 22)),
+              Text('TRACK', style: TextStyle(color: Color.fromARGB(255, 162, 123, 92), fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 22))
+            ],
           ),
-        },
-        //markers: <Marker>{_createMarker()},
-        initialCameraPosition: const CameraPosition(
-          target: center,
-          zoom: 16.0,
         ),
-        myLocationEnabled: true);
+        body: GoogleMap(
+          onMapCreated: _onMapCreated,
+          markers: _markers,
+          polylines: _polyline,
+          //markers: <Marker>{_createMarker()},
+          initialCameraPosition: const CameraPosition(
+            target: center,
+            zoom: 16.0,
+          ),
+          myLocationEnabled: true,
+          zoomControlsEnabled: false,
+        ),
+        // Floating Action Button
+        floatingActionButton: SpeedDial(
+          label: const Text("Select Route", style: TextStyle(color: Colors.black, fontFamily: 'Poppins', fontSize: 12)),
+          animatedIcon: AnimatedIcons.menu_close,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          renderOverlay: false,
+          animationDuration: const Duration(milliseconds: 500),
+          spacing: 20,
+          children: [
+            SpeedDialChild(
+              child: const Icon(Icons.directions_bus),
+              label: 'Internal Route',
+              onTap: () {
+                track(1);
+              }, // Set Action
+            ),
+            SpeedDialChild(
+              child: const Icon(Icons.directions_bus),
+              label: 'External Route',
+              onTap: () {
+                track(2);
+              }, // Set Action
+            ),
+            SpeedDialChild(
+              child: const Icon(Icons.directions_bus),
+              label: 'Station 18 Route',
+              onTap: () {
+                track(3);
+              }, // Set Action
+            ),
+          ],
+        ));
   }
 }

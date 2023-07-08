@@ -158,6 +158,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_google_map_polyline_point:
+    dependency: "direct main"
+    description:
+      name: flutter_google_map_polyline_point
+      sha256: da6101ca04fd8ab928cf944c3d053c4cfa29532dd5ae8e19d7bd56f5edf2c555
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
   flutter_lints:
     dependency: "direct dev"
     description:

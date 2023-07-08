@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
-class ETA extends StatelessWidget {
+class ETA extends StatefulWidget {
   const ETA({super.key});
 
+  @override
+  State<ETA> createState() => _ETAState();
+}
+
+class _ETAState extends State<ETA> {
   @override
   Widget build(
     BuildContext context,
