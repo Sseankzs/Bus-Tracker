@@ -7,10 +7,23 @@ import 'package:user/eta.dart';
 import 'package:user/schedule.dart';
 import 'package:geolocator/geolocator.dart';
 
-FirebaseDatabase database = FirebaseDatabase.instance;
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-void main() {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const MyApp());
+
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    return;
+  }
+  LocationPermission permission = await Geolocator.checkPermission();
+  while (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+    permission = await Geolocator.requestPermission();
+  }
 }
 
 class MyApp extends StatelessWidget {
