@@ -38,7 +38,7 @@ class _LogInState extends State<MainPage> {
     return Scaffold(
       body: const [ETA(), BusTrack(), Schedule()][currentpage],
       bottomNavigationBar: NavigationBar(
-        backgroundColor: const Color.fromRGBO(220, 215, 201, 1),
+        backgroundColor: const Color.fromRGBO(162, 123, 92, 1),
         animationDuration: const Duration(milliseconds: 500),
         destinations: const [
           NavigationDestination(
