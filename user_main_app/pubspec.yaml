@@ -80,6 +80,8 @@ flutter:
     - images/UTP_Bus Schedule_Shuttle Bus to Stn 18.png
     - images/bus.png
     - images/bus-32.png
+    - images/bus-48.png
+    - images/bus-64.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
