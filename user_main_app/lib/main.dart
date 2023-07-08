@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:geolocator/geolocator.dart';
-import 'firebase_options.dart';
-import 'package:user/bus_track.dart';
 import 'package:user/eta.dart';
 import 'package:user/schedule.dart';
+import 'package:user/bus_track.dart';
+import 'package:geolocator/geolocator.dart';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -20,7 +20,8 @@ void main() async {
     return;
   }
   LocationPermission permission = await Geolocator.checkPermission();
-  while (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+  while (permission == LocationPermission.denied ||
+      permission == LocationPermission.deniedForever) {
     permission = await Geolocator.requestPermission();
   }
 }
