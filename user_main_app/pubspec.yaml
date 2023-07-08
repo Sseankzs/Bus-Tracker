@@ -38,6 +38,8 @@ dependencies:
   google_maps_flutter: ^2.3.1
   cloud_firestore: ^4.8.2
   firebase_database: ^10.2.3
+  photo_view: ^0.14.0
+  zoom_pinch_overlay: ^1.4.1+3
 
 dev_dependencies:
   flutter_test:
@@ -66,7 +68,9 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
-  - images/UTP Bus Schedule 21.12.2020 v2.png
+  - images/UTP_Bus Schedule_External.png
+  - images/UTP_Bus Schedule_Internal.png
+  - images/UTP_Bus Schedule_Shuttle Bus to Stn 18.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
