@@ -51,6 +51,7 @@ class _MyAppState extends State<MyApp> {
   };
   int? duration = 0;
   int? distance = 0;
+  http.Response? polyline;
 
   static const LocationSettings locationSettings = LocationSettings(
     accuracy: LocationAccuracy.high,
@@ -79,6 +80,7 @@ class _MyAppState extends State<MyApp> {
       duration = 0;
       distance = 0;
       scheduleData = null;
+      polyline = null;
       if (positionStream != null) positionStream?.cancel();
     });
     if (positionStream != null) positionStream?.cancel();
@@ -122,7 +124,6 @@ class _MyAppState extends State<MyApp> {
         });
       }
       //debugPrint(scheduleData.toString());
-
       // retrieve data from firebase
       if (currentStopData?["name"] == null) {
         currentStopData?["name"] = scheduleData![currentStop!.toInt()]['name'];
@@ -139,6 +140,61 @@ class _MyAppState extends State<MyApp> {
 
       //debugPrint(currentStopData?.toString());
       //debugPrint(nextStopData?.toString());
+
+      if (polyline == null) {
+        //generate intermediates
+        List<dynamic> intermediates = [];
+        //loop through scheduleData
+        for (int i = 1; i < scheduleData!.length - 1; i++) {
+          intermediates.add('''{
+            "location": {
+              "latLng": {
+                "latitude": ${scheduleData![i]['lat']},
+                "longitude": ${scheduleData![i]['long']},
+              }
+            }
+          }''');
+        }
+
+        //draw polyline
+        polyline = await http.post(
+          Uri.parse('https://routes.googleapis.com/directions/v2:computeRoutes'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': 'AIzaSyAPCuddVW7ch26c7zek493XKjRz4bnkKoc',
+            'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters,routes.polyline,routes.legs.polyline',
+          },
+          body: '''{
+            "origin":{
+              "location":{
+                "latLng":{
+                  "latitude": ${scheduleData?[0]['lat']},
+                  "longitude": ${scheduleData?[0]["long"]}
+                }
+              }
+            },
+            "destination":{
+              "location":{
+                "latLng":{
+                  "latitude": ${scheduleData?[scheduleData!.length - 1]["lat"]},
+                  "longitude": ${scheduleData?[scheduleData!.length - 1]["long"]}
+                }
+              }
+            },
+            "intermediates": $intermediates,
+            "travelMode": "DRIVE"
+          }''',
+        );
+
+        debugPrint(polyline?.statusCode.toString());
+        debugPrint(polyline?.body.toString());
+        var polylineBody = jsonDecode(polyline!.body);
+        var polylinePoints = polylineBody['routes'][0]['polyline']['encodedPolyline'];
+
+        await ref?.child("bus$currentTrackingBus").update({
+          'polyline': polylinePoints,
+        });
+      }
 
       http.Response response = await http.post(
         Uri.parse('https://routes.googleapis.com/directions/v2:computeRoutes'),
