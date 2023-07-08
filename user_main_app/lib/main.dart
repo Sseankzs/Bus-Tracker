@@ -1,12 +1,18 @@
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:user/eta.dart';
 import 'package:user/map.dart';
 import 'package:user/schedule.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-FirebaseDatabase database = FirebaseDatabase.instance;
-
-void main() {
+void main() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
