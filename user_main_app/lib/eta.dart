@@ -13,13 +13,9 @@ class ETA extends StatelessWidget {
         Column(
           children: [
             Container(
-              alignment: Alignment.topLeft,
-              height: 50,
-            ),
-            const Positioned(
-              left: 17,
-              top: 19,
-              child: Text.rich(
+              //alignment: const Alignment(0.01, 0.2),
+              padding: const EdgeInsets.fromLTRB(17, 38, 19, 2),
+              child: const Text.rich(
                 TextSpan(
                   children: [
                     TextSpan(
@@ -45,11 +41,33 @@ class ETA extends StatelessWidget {
               ),
             ),
 
+            const Text(
+              'This page displays updated status of each route',
+            ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(1, 20, 1, 1),
+              child: const Text(
+                'ETA Status',
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 10,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+
+            const Text(
+              'Internal Shuttle Bus',
+              textAlign: TextAlign.left,
+              style: TextStyle(fontSize: 10, fontFamily: 'Poppins'),
+            ),
             //First Container
             Positioned(
               child: Container(
                 alignment: Alignment.center,
-                padding: const EdgeInsets.fromLTRB(40, 10, 20, 10),
+                padding: const EdgeInsets.fromLTRB(20, 5, 20, 20),
                 child: Column(
                   children: [
                     InkWell(
@@ -88,11 +106,15 @@ class ETA extends StatelessWidget {
                 ),
               ),
             ),
-
+            const Text(
+              'External Shuttle Bus (Seri Iskandar)',
+              textAlign: TextAlign.left,
+              style: TextStyle(fontSize: 10, fontFamily: 'Poppins'),
+            ),
             //Second Container
             Container(
               alignment: Alignment.center,
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+              padding: const EdgeInsets.fromLTRB(20, 5, 20, 30),
               child: Column(
                 children: [
                   InkWell(
@@ -130,10 +152,15 @@ class ETA extends StatelessWidget {
                 ],
               ),
             ),
+            const Text(
+              'External Shuttle Bus (Stn 18)',
+              textAlign: TextAlign.left,
+              style: TextStyle(fontSize: 10, fontFamily: 'Poppins'),
+            ),
             //Third Container
             Container(
               alignment: Alignment.center,
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+              padding: const EdgeInsets.fromLTRB(20, 5, 20, 30),
               child: Column(
                 children: [
                   InkWell(
