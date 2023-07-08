@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:user/bus_track.dart';
 import 'package:user/eta.dart';
-import 'package:user/map.dart';
 import 'package:user/schedule.dart';
 
 FirebaseDatabase database = FirebaseDatabase.instance;

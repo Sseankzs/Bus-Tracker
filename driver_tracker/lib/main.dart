@@ -88,7 +88,15 @@ class _MyAppState extends State<MyApp> {
     return;
   }
 
-  void track(int route) {
+  void track(int route) async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return;
+    }
+    LocationPermission permission = await Geolocator.checkPermission();
+    while (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+    }
     // Reset previous route
     if (route == currentTrackingRoute) {
       stopTrack();
