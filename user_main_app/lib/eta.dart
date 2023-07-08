@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +13,8 @@ class ETA extends StatefulWidget {
 class _ETAState extends State<ETA> {
   int nextStopNum = 0;
   String nextStop = '-';
+  bool operating = false;
+  Color dotStatus = const Color.fromRGBO(255, 0, 0, 1);
   final _database = FirebaseDatabase.instance.ref();
 
   @override
@@ -20,6 +24,21 @@ class _ETAState extends State<ETA> {
   }
 
   void _activateListeners() {
+    _database.child('route1/bus1/operation').onValue.listen(
+      (event) {
+        final bool operating = event.snapshot.value as bool;
+        setState(
+          () {
+            if (operating == true) {
+              dotStatus = const Color.fromRGBO(0, 255, 0, 1);
+            } else {
+              dotStatus = const Color.fromRGBO(255, 0, 0, 1);
+            }
+          },
+        );
+      },
+    );
+
     _database.child('route1/bus1/nextStop').onValue.listen(
       (event) {
         final int nextStopNum = event.snapshot.value as int;
@@ -130,16 +149,19 @@ class _ETAState extends State<ETA> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               shadows: const [
-                                BoxShadow(color: Colors.grey, blurRadius: 4, offset: Offset(0, 4)),
+                                BoxShadow(
+                                    color: Colors.grey,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 4)),
                               ],
                               color: Colors.white,
                             ),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.circle_rounded,
                                   size: 15,
-                                  color: Colors.red,
+                                  color: dotStatus,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
@@ -152,7 +174,8 @@ class _ETAState extends State<ETA> {
                                     alignment: Alignment.centerRight,
                                     child: const Text(
                                       '00:00PM',
-                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 ),
@@ -180,16 +203,19 @@ class _ETAState extends State<ETA> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               shadows: const [
-                                BoxShadow(color: Colors.grey, blurRadius: 4, offset: Offset(0, 4)),
+                                BoxShadow(
+                                    color: Colors.grey,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 4)),
                               ],
                               color: Colors.white,
                             ),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.circle_rounded,
                                   size: 15,
-                                  color: Colors.red,
+                                  color: dotStatus,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
@@ -202,7 +228,8 @@ class _ETAState extends State<ETA> {
                                     alignment: Alignment.centerRight,
                                     child: const Text(
                                       '00:00PM',
-                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 ),
@@ -230,16 +257,19 @@ class _ETAState extends State<ETA> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             shadows: const [
-                              BoxShadow(color: Colors.grey, blurRadius: 4, offset: Offset(0, 4)),
+                              BoxShadow(
+                                  color: Colors.grey,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 4)),
                             ],
                             color: Colors.white,
                           ),
                           child: Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.circle_rounded,
                                 size: 15,
-                                color: Colors.red,
+                                color: dotStatus,
                               ),
                               const SizedBox(width: 4),
                               Text(
@@ -252,7 +282,8 @@ class _ETAState extends State<ETA> {
                                   alignment: Alignment.centerRight,
                                   child: const Text(
                                     '00:00PM',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
