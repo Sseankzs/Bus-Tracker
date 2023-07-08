@@ -9,8 +9,6 @@ class ETA extends StatefulWidget {
 }
 
 class _ETAState extends State<ETA> {
-<<<<<<< HEAD
-=======
   int nextStopNum = 0;
   String nextStop = '-';
   final _database = FirebaseDatabase.instance.ref();
@@ -42,7 +40,6 @@ class _ETAState extends State<ETA> {
     );
   }
 
->>>>>>> 54871c9b2f1bbbce1eb27b79e93a35229c1b3809
   @override
   Widget build(
     BuildContext context,
@@ -133,10 +130,7 @@ class _ETAState extends State<ETA> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               shadows: const [
-                                BoxShadow(
-                                    color: Colors.grey,
-                                    blurRadius: 4,
-                                    offset: Offset(0, 4)),
+                                BoxShadow(color: Colors.grey, blurRadius: 4, offset: Offset(0, 4)),
                               ],
                               color: Colors.white,
                             ),
@@ -158,8 +152,7 @@ class _ETAState extends State<ETA> {
                                     alignment: Alignment.centerRight,
                                     child: const Text(
                                       '00:00PM',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 ),
@@ -187,10 +180,7 @@ class _ETAState extends State<ETA> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               shadows: const [
-                                BoxShadow(
-                                    color: Colors.grey,
-                                    blurRadius: 4,
-                                    offset: Offset(0, 4)),
+                                BoxShadow(color: Colors.grey, blurRadius: 4, offset: Offset(0, 4)),
                               ],
                               color: Colors.white,
                             ),
@@ -212,8 +202,7 @@ class _ETAState extends State<ETA> {
                                     alignment: Alignment.centerRight,
                                     child: const Text(
                                       '00:00PM',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 ),
@@ -241,10 +230,7 @@ class _ETAState extends State<ETA> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             shadows: const [
-                              BoxShadow(
-                                  color: Colors.grey,
-                                  blurRadius: 4,
-                                  offset: Offset(0, 4)),
+                              BoxShadow(color: Colors.grey, blurRadius: 4, offset: Offset(0, 4)),
                             ],
                             color: Colors.white,
                           ),
@@ -266,8 +252,7 @@ class _ETAState extends State<ETA> {
                                   alignment: Alignment.centerRight,
                                   child: const Text(
                                     '00:00PM',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                    style: TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
