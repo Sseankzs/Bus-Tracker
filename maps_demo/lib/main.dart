@@ -1,18 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-FirebaseDatabase database = FirebaseDatabase.instance;
-
-import 'package:firebase_database/firebase_database.dart';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-
-import 'package:geolocator/geolocator.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -161,8 +154,7 @@ class _MyAppState extends State<MyApp> {
             initialCameraPosition: const CameraPosition(
               target: center,
               zoom: 16.0,
-            )
-            ,
+            ),
             myLocationEnabled: true),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () => track(1),
