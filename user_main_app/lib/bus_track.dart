@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class BusTrack extends StatelessWidget {
   const BusTrack({super.key});
@@ -40,14 +42,31 @@ class BusTrack extends StatelessWidget {
       ),
 
       // Floating Action Button
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Set action
-        },
-        child: const Icon(Icons.list),
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        foregroundColor: const Color.fromARGB(255, 0, 0, 0),
-      ),
+      floatingActionButton: SpeedDial(
+        animatedIcon: AnimatedIcons.menu_close,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        overlayColor: Colors.black,
+        overlayOpacity: 0.05,
+        spacing: 10,
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.directions_bus),
+            label: 'Internal Route',
+            onTap: (){}, // Set Action
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.directions_bus),
+            label: 'External Route',
+            onTap: (){}, // Set Action
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.directions_bus),
+            label: 'Station 18 Route',
+            onTap: (){}, // Set Action
+          ),
+        ],
+      )
     );
   }
 }
