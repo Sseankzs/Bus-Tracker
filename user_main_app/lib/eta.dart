@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:user/route_details.dart';
 
 class ETA extends StatefulWidget {
   const ETA({super.key});
@@ -11,11 +12,10 @@ class ETA extends StatefulWidget {
 }
 
 class _ETAState extends State<ETA> {
-  int nextStopNum = 0;
-  String nextStop = '-';
-  bool operating = false;
-  Color dotStatus = const Color.fromRGBO(255, 0, 0, 1);
   final _database = FirebaseDatabase.instance.ref();
+  late Details route3;
+  late Details route1;
+  late Details route2;
 
   @override
   void initState() {
@@ -24,34 +24,74 @@ class _ETAState extends State<ETA> {
   }
 
   void _activateListeners() {
-    _database.child('route1/bus1/operation').onValue.listen(
+    _database.child('route1/bus1').onValue.listen(
       (event) {
-        final bool operating = event.snapshot.value as bool;
+        final data = Map<String, dynamic>.from(event.snapshot.value as dynamic);
+        route1 = Details.fromBusDB(data);
         setState(
           () {
-            if (operating == true) {
-              dotStatus = const Color.fromRGBO(0, 255, 0, 1);
+            if (route1.operating == true) {
+              route1.dotStatus = const Color.fromRGBO(0, 255, 0, 1);
+              if (route1.nextStopNum == 0) {
+                route1.nextStop = 'PMMD';
+              } else if (route1.nextStopNum == 1) {
+                route1.nextStop = 'Lotus Seri Ikandar';
+              } else if (route1.nextStopNum == 2) {
+                route1.nextStop = 'Seri Iskandar Bus Stn';
+              } else if (route1.nextStopNum == 3) {
+                route1.nextStop = 'PMMD';
+              }
             } else {
-              dotStatus = const Color.fromRGBO(255, 0, 0, 1);
+              route1.dotStatus = const Color.fromRGBO(255, 0, 0, 1);
+              route1.nextStop = '-';
             }
           },
         );
       },
     );
-
-    _database.child('route1/bus1/nextStop').onValue.listen(
+    _database.child('route2/bus1').onValue.listen(
       (event) {
-        final int nextStopNum = event.snapshot.value as int;
+        final data = Map<String, dynamic>.from(event.snapshot.value as dynamic);
+        route2 = Details.fromBusDB(data);
         setState(
           () {
-            if (nextStopNum == 0) {
-              nextStop = 'PMMD';
-            } else if (nextStopNum == 1) {
-              nextStop = 'An-Nur Mosque';
-            } else if (nextStopNum == 2) {
-              nextStop = 'Chancellor Complex';
-            } else if (nextStopNum == 3) {
-              nextStop = 'R&D';
+            if (route2.operating == true) {
+              route2.dotStatus = const Color.fromRGBO(0, 255, 0, 1);
+              if (route2.nextStopNum == 0) {
+                route2.nextStop = 'PMMD';
+              } else if (route2.nextStopNum == 1) {
+                route2.nextStop = 'An-Nur Mosque';
+              } else if (route2.nextStopNum == 2) {
+                route2.nextStop = 'Chancellor Complex';
+              } else if (route2.nextStopNum == 3) {
+                route2.nextStop = 'R&D';
+              }
+            } else {
+              route2.dotStatus = const Color.fromRGBO(255, 0, 0, 1);
+              route2.nextStop = '-';
+            }
+          },
+        );
+      },
+    );
+    _database.child('route3/bus1').onValue.listen(
+      (event) {
+        final data = Map<String, dynamic>.from(event.snapshot.value as dynamic);
+        route3 = Details.fromBusDB(data);
+        setState(
+          () {
+            if (route3.operating == true) {
+              route3.dotStatus = const Color.fromRGBO(0, 255, 0, 1);
+              if (route3.nextStopNum == 0) {
+                route3.nextStop = 'PMMD';
+              } else if (route3.nextStopNum == 1) {
+                route3.nextStop = 'Aeon Station 18';
+              } else if (route3.nextStopNum == 2) {
+                route3.nextStop = 'PMMD';
+              }
+            } else {
+              route3.dotStatus = const Color.fromRGBO(255, 0, 0, 1);
+              route3.nextStop = '-';
             }
           },
         );
@@ -161,13 +201,13 @@ class _ETAState extends State<ETA> {
                                 Icon(
                                   Icons.circle_rounded,
                                   size: 15,
-                                  color: dotStatus,
+                                  color: route2.dotStatus,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  'Next Stop:  $nextStop',
+                                  'Next Stop:  ${route2.nextStop}',
                                   textAlign: TextAlign.left,
-                                  style: TextStyle(fontSize: 15),
+                                  style: const TextStyle(fontSize: 15),
                                 ),
                                 Expanded(
                                   child: Container(
@@ -215,13 +255,13 @@ class _ETAState extends State<ETA> {
                                 Icon(
                                   Icons.circle_rounded,
                                   size: 15,
-                                  color: dotStatus,
+                                  color: route1.dotStatus,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  'Next Stop: $nextStop',
+                                  'Next Stop: ${route1.nextStop}',
                                   textAlign: TextAlign.left,
-                                  style: TextStyle(fontSize: 15),
+                                  style: const TextStyle(fontSize: 15),
                                 ),
                                 Expanded(
                                   child: Container(
@@ -269,13 +309,13 @@ class _ETAState extends State<ETA> {
                               Icon(
                                 Icons.circle_rounded,
                                 size: 15,
-                                color: dotStatus,
+                                color: route3.dotStatus,
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'Next Stop: $nextStop',
+                                'Next Stop: ${route3.nextStop}',
                                 textAlign: TextAlign.left,
-                                style: TextStyle(fontSize: 15),
+                                style: const TextStyle(fontSize: 15),
                               ),
                               Expanded(
                                 child: Container(
