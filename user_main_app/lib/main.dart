@@ -1,13 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:geolocator/geolocator.dart';
+import 'firebase_options.dart';
 import 'package:user/bus_track.dart';
 import 'package:user/eta.dart';
 import 'package:user/schedule.dart';
 
-FirebaseDatabase database = FirebaseDatabase.instance;
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-void main() {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const MyApp());
+
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    return;
+  }
+  LocationPermission permission = await Geolocator.checkPermission();
+  while (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+    permission = await Geolocator.requestPermission();
+  }
 }
 
 class MyApp extends StatelessWidget {
