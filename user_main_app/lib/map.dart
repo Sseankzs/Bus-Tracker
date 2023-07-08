@@ -44,7 +44,9 @@ class _MapsState extends State<MapPage> {
   }
 
   void addCustomIcon() {
-    BitmapDescriptor.fromAssetImage(const ImageConfiguration(), "images/bus-32.png").then(
+    BitmapDescriptor.fromAssetImage(
+            const ImageConfiguration(), "images/bus-32.png")
+        .then(
       (icon) {
         setState(() {
           busIcon = icon;
@@ -75,7 +77,8 @@ class _MapsState extends State<MapPage> {
     if (polyline.exists && _polyline.isEmpty) {
       debugPrint(polyline.value.toString());
       PolylinePoints polylinePoints = PolylinePoints();
-      List<PointLatLng> latlng = polylinePoints.decodePolyline(polyline.value.toString());
+      List<PointLatLng> latlng =
+          polylinePoints.decodePolyline(polyline.value.toString());
       // convert List<PointLatLng> into List<LatLng>
       List<LatLng> points = [];
       for (var i = 0; i < latlng.length; i++) {
@@ -161,8 +164,10 @@ class _MapsState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     if (currentTrackingRoute != null) {
-      CameraPosition currentLocation = CameraPosition(target: LatLng(latitude!, longitude!), zoom: 16);
-      mapController.animateCamera(CameraUpdate.newCameraPosition(currentLocation));
+      CameraPosition currentLocation =
+          CameraPosition(target: LatLng(latitude!, longitude!), zoom: 16);
+      mapController
+          .animateCamera(CameraUpdate.newCameraPosition(currentLocation));
     }
     return Scaffold(
         appBar: AppBar(
@@ -174,9 +179,24 @@ class _MapsState extends State<MapPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text('BUS', style: TextStyle(color: Colors.black, fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 22)),
-              Text(' ', style: TextStyle(color: Colors.black, fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 22)),
-              Text('TRACK', style: TextStyle(color: Color.fromARGB(255, 162, 123, 92), fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 22))
+              Text('BUS',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22)),
+              Text(' ',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22)),
+              Text('TRACK',
+                  style: TextStyle(
+                      color: Color.fromARGB(255, 162, 123, 92),
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22))
             ],
           ),
         ),
@@ -194,7 +214,9 @@ class _MapsState extends State<MapPage> {
         ),
         // Floating Action Button
         floatingActionButton: SpeedDial(
-          label: const Text("Select Route", style: TextStyle(color: Colors.black, fontFamily: 'Poppins', fontSize: 12)),
+          label: const Text("Select Route",
+              style: TextStyle(
+                  color: Colors.black, fontFamily: 'Poppins', fontSize: 12)),
           animatedIcon: AnimatedIcons.menu_close,
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
