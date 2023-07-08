@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:user/route_details.dart';
+import 'package:intl/intl.dart';
 
 class ETA extends StatefulWidget {
   const ETA({super.key});
@@ -16,6 +17,13 @@ class _ETAState extends State<ETA> {
   late Details route3;
   late Details route1;
   late Details route2;
+  late int time1;
+  late int time2;
+  late int time3;
+  final now = DateTime.now();
+  late final eta1 = now.add(Duration(seconds: time1));
+  late final eta2 = now.add(Duration(seconds: time2));
+  late final eta3 = now.add(Duration(seconds: time3));
 
   @override
   void initState() {
@@ -32,6 +40,7 @@ class _ETAState extends State<ETA> {
           () {
             if (route1.operating == true) {
               route1.dotStatus = const Color.fromRGBO(0, 255, 0, 1);
+              time1 = route1.seconds;
               if (route1.nextStopNum == 0) {
                 route1.nextStop = 'PMMD';
               } else if (route1.nextStopNum == 1) {
@@ -44,6 +53,7 @@ class _ETAState extends State<ETA> {
             } else {
               route1.dotStatus = const Color.fromRGBO(255, 0, 0, 1);
               route1.nextStop = '-';
+              time1 = 0;
             }
           },
         );
@@ -57,6 +67,7 @@ class _ETAState extends State<ETA> {
           () {
             if (route2.operating == true) {
               route2.dotStatus = const Color.fromRGBO(0, 255, 0, 1);
+              time2 = route2.seconds;
               if (route2.nextStopNum == 0) {
                 route2.nextStop = 'PMMD';
               } else if (route2.nextStopNum == 1) {
@@ -69,6 +80,7 @@ class _ETAState extends State<ETA> {
             } else {
               route2.dotStatus = const Color.fromRGBO(255, 0, 0, 1);
               route2.nextStop = '-';
+              time2 = 0;
             }
           },
         );
@@ -82,6 +94,7 @@ class _ETAState extends State<ETA> {
           () {
             if (route3.operating == true) {
               route3.dotStatus = const Color.fromRGBO(0, 255, 0, 1);
+              time3 = route3.seconds;
               if (route3.nextStopNum == 0) {
                 route3.nextStop = 'PMMD';
               } else if (route3.nextStopNum == 1) {
@@ -92,6 +105,7 @@ class _ETAState extends State<ETA> {
             } else {
               route3.dotStatus = const Color.fromRGBO(255, 0, 0, 1);
               route3.nextStop = '-';
+              time3 = 0;
             }
           },
         );
@@ -212,9 +226,9 @@ class _ETAState extends State<ETA> {
                                 Expanded(
                                   child: Container(
                                     alignment: Alignment.centerRight,
-                                    child: const Text(
-                                      '00:00PM',
-                                      style: TextStyle(
+                                    child: Text(
+                                      DateFormat.jm().format(eta2),
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
                                   ),
@@ -266,9 +280,9 @@ class _ETAState extends State<ETA> {
                                 Expanded(
                                   child: Container(
                                     alignment: Alignment.centerRight,
-                                    child: const Text(
-                                      '00:00PM',
-                                      style: TextStyle(
+                                    child: Text(
+                                      DateFormat.jm().format(eta1),
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
                                   ),
@@ -320,10 +334,10 @@ class _ETAState extends State<ETA> {
                               Expanded(
                                 child: Container(
                                   alignment: Alignment.centerRight,
-                                  child: const Text(
-                                    '00:00PM',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                  child: Text(
+                                    DateFormat.jm().format(eta2),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
