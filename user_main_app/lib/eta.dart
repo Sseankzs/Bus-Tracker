@@ -102,40 +102,41 @@ class ETA extends StatelessWidget {
                       },
                       child: Card(
                         child: Container(
-                            width: 350,
-                            height: 50,
-                            padding: const EdgeInsets.fromLTRB(15, 1, 15, 1),
-                            decoration: ShapeDecoration(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              shadows: const [
-                                BoxShadow(
-                                    color: Colors.grey,
-                                    blurRadius: 4,
-                                    offset: Offset(0, 4)),
-                              ],
-                              color: Colors.white,
+                          width: 350,
+                          height: 50,
+                          padding: const EdgeInsets.fromLTRB(15, 1, 15, 1),
+                          decoration: ShapeDecoration(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Row(
-                              children: [
-                                Icon(
-                                  Icons.circle_rounded,
-                                  size: 12,
-                                  color: Colors.red,
-                                ),
-                                Text(
-                                  'Next Stop: ',
-                                  textAlign: TextAlign.left,
-                                ),
-                                SizedBox(width: 140),
-                                Text(
-                                  'ETA - 00:00PM',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            )),
+                            shadows: const [
+                              BoxShadow(
+                                  color: Colors.grey,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 4)),
+                            ],
+                            color: Colors.white,
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(
+                                Icons.circle_rounded,
+                                size: 12,
+                                color: Colors.red,
+                              ),
+                              Text(
+                                'Next Stop: ',
+                                textAlign: TextAlign.left,
+                              ),
+                              SizedBox(width: 140),
+                              Text(
+                                'ETA - 00:00PM',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -175,7 +176,7 @@ class ETA extends StatelessWidget {
                       child: Container(
                         width: 350,
                         height: 50,
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.fromLTRB(15, 1, 15, 1),
                         decoration: ShapeDecoration(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -187,6 +188,25 @@ class ETA extends StatelessWidget {
                                 offset: Offset(0, 4)),
                           ],
                           color: Colors.white,
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(
+                              Icons.circle_rounded,
+                              size: 12,
+                              color: Colors.red,
+                            ),
+                            Text(
+                              'Next Stop: ',
+                              textAlign: TextAlign.left,
+                            ),
+                            SizedBox(width: 140),
+                            Text(
+                              'ETA - 00:00PM',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -227,7 +247,7 @@ class ETA extends StatelessWidget {
                       child: Container(
                         width: 350,
                         height: 50,
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.fromLTRB(15, 1, 15, 1),
                         decoration: ShapeDecoration(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -239,6 +259,25 @@ class ETA extends StatelessWidget {
                                 offset: Offset(0, 4)),
                           ],
                           color: Colors.white,
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(
+                              Icons.circle_rounded,
+                              size: 12,
+                              color: Colors.red,
+                            ),
+                            Text(
+                              'Next Stop: ',
+                              textAlign: TextAlign.left,
+                            ),
+                            SizedBox(width: 140),
+                            Text(
+                              'ETA - 00:00PM',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
                       ),
                     ),
