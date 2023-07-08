@@ -94,6 +94,7 @@ class _MyAppState extends State<MyApp> {
       currentTrackingRoute = route;
     });
 
+<<<<<<< HEAD
     positionStream =
         Geolocator.getPositionStream(locationSettings: locationSettings)
             .listen((Position? position) async {
@@ -111,6 +112,29 @@ class _MyAppState extends State<MyApp> {
           ? 'Unknown data on $currentTrackingRoute'
           : '$currentTrackingRoute : ${position.latitude.toString()}, ${position.longitude.toString()}');
     });
+=======
+    // Start listening, including update to firebase
+    positionStream =
+        Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+      (Position? position) async {
+        ref = FirebaseDatabase.instance
+            .ref("route$currentTrackingRoute/bus$currentTrackingBus");
+        await ref?.update(
+          {
+            'lat': position?.latitude,
+            'long': position?.longitude,
+            'speed': position?.speed,
+            'heading': position?.heading,
+            'accuracy': position?.accuracy,
+            'altitude': position?.altitude,
+          },
+        );
+        debugPrint(position == null
+            ? 'Unknown data on $currentTrackingRoute'
+            : '$currentTrackingRoute : ${position.latitude.toString()}, ${position.longitude.toString()}');
+      },
+    );
+>>>>>>> 0386f53ee8a53daf9c2bbbcbc029b7b068bf8785
   }
 
   @override
@@ -125,6 +149,7 @@ class _MyAppState extends State<MyApp> {
             child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+<<<<<<< HEAD
             Image.asset('assets/UTP-logo2.png', height: 100),
             const SizedBox(height: 10),
             Text(
@@ -190,6 +215,17 @@ class _MyAppState extends State<MyApp> {
                   _openMap(lat, long);
                 },
                 child: const Text("Open Map"))
+=======
+            Text(currentTrackingRoute == null
+                ? "Track Status: Not Tracking"
+                : "Track Status: Tracking on Route $currentTrackingRoute Bus $currentTrackingBus"),
+            FilledButton(
+                onPressed: () => track(1), child: const Text("Route 1")),
+            FilledButton(
+                onPressed: () => track(2), child: const Text("Route 2")),
+            FilledButton(
+                onPressed: () => track(3), child: const Text("Route 3")),
+>>>>>>> 0386f53ee8a53daf9c2bbbcbc029b7b068bf8785
           ],
         )),
       ),

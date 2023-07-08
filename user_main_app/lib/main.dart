@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:user/eta.dart';
+import 'package:user/map.dart';
+import 'package:user/schedule.dart';
 
 FirebaseDatabase database = FirebaseDatabase.instance;
 
@@ -15,21 +17,55 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LogIn(),
+      home: MainPage(),
     );
   }
 }
 
-class LogIn extends StatefulWidget {
-  const LogIn({super.key});
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
 
   @override
-  State<LogIn> createState() => _LogInState();
+  State<MainPage> createState() => _LogInState();
 }
 
-class _LogInState extends State<LogIn> {
+class _LogInState extends State<MainPage> {
+  int currentpage = 0;
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    return Scaffold(
+      body: const [ETA(), MapPage(), Schedule()][currentpage],
+      bottomNavigationBar: NavigationBar(
+        backgroundColor: const Color.fromRGBO(220, 215, 201, 1),
+        animationDuration: const Duration(milliseconds: 500),
+        destinations: const [
+          NavigationDestination(
+              icon: Icon(
+                Icons.roundabout_left,
+                color: Colors.black,
+              ),
+              label: 'ETA'),
+          NavigationDestination(
+              icon: Icon(
+                Icons.map,
+                color: Colors.black,
+              ),
+              label: 'Maps'),
+          NavigationDestination(
+              icon: Icon(
+                Icons.table_chart,
+                color: Colors.black,
+              ),
+              label: 'Schedule'),
+        ],
+        onDestinationSelected: (int index) {
+          setState(() {
+            currentpage = index;
+          });
+        },
+        selectedIndex: currentpage,
+      ),
+    );
   }
 }
