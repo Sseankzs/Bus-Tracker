@@ -1,9 +1,10 @@
-import 'dart:ffi';
+import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:user/route_details.dart';
 import 'package:intl/intl.dart';
+import 'package:printing/printing.dart';
 
 class ETA extends StatefulWidget {
   const ETA({super.key});
@@ -17,7 +18,6 @@ class _ETAState extends State<ETA> {
   late Details route3;
   late Details route1;
   late Details route2;
-
   dynamic eta1 = DateTime.now();
   dynamic eta2 = DateTime.now();
   dynamic eta3 = DateTime.now();
@@ -29,8 +29,6 @@ class _ETAState extends State<ETA> {
   }
 
   void _activateListeners() {
-    dynamic now = DateTime.now();
-
     _database.child('route1/bus1').onValue.listen(
       (event) {
         final data = Map<String, dynamic>.from(event.snapshot.value as dynamic);
@@ -38,6 +36,8 @@ class _ETAState extends State<ETA> {
         setState(
           () {
             if (route1.operating == true) {
+              dynamic now = DateTime.now();
+
               route1.dotStatus = const Color.fromRGBO(0, 255, 0, 1);
               eta1 = now.add(
                 Duration(seconds: route1.seconds),
@@ -66,6 +66,7 @@ class _ETAState extends State<ETA> {
         setState(
           () {
             if (route2.operating == true) {
+              dynamic now = DateTime.now();
               route2.dotStatus = const Color.fromRGBO(0, 255, 0, 1);
               eta2 = now.add(
                 Duration(seconds: route2.seconds),
@@ -82,6 +83,7 @@ class _ETAState extends State<ETA> {
             } else {
               route2.dotStatus = const Color.fromRGBO(255, 0, 0, 1);
               route2.nextStop = '-';
+              eta2 = DateTime.now();
             }
           },
         );
@@ -94,6 +96,7 @@ class _ETAState extends State<ETA> {
         setState(
           () {
             if (route3.operating == true) {
+              dynamic now = DateTime.now();
               route3.dotStatus = const Color.fromRGBO(0, 255, 0, 1);
               eta3 = now.add(
                 Duration(seconds: route3.seconds),
@@ -108,6 +111,7 @@ class _ETAState extends State<ETA> {
             } else {
               route3.dotStatus = const Color.fromRGBO(255, 0, 0, 1);
               route3.nextStop = '-';
+              eta3 = DateTime.now();
             }
           },
         );
@@ -337,7 +341,7 @@ class _ETAState extends State<ETA> {
                                 child: Container(
                                   alignment: Alignment.centerRight,
                                   child: Text(
-                                    'ETA ${DateFormat.jm().format(eta2)}',
+                                    'ETA ${DateFormat.jm().format(eta3)}',
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold),
                                   ),
