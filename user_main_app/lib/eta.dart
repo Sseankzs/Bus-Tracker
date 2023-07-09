@@ -1,10 +1,7 @@
-import 'dart:async';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:user/route_details.dart';
 import 'package:intl/intl.dart';
-import 'package:printing/printing.dart';
 
 class ETA extends StatefulWidget {
   const ETA({super.key});
@@ -15,9 +12,9 @@ class ETA extends StatefulWidget {
 
 class _ETAState extends State<ETA> {
   final _database = FirebaseDatabase.instance.ref();
-  late Details route3;
-  late Details route1;
-  late Details route2;
+  late Details route3 = Details(nextStopNum: 0, operating: false, seconds: 0);
+  late Details route1 = Details(nextStopNum: 0, operating: false, seconds: 0);
+  late Details route2 = Details(nextStopNum: 0, operating: false, seconds: 0);
   dynamic eta1 = DateTime.now();
   dynamic eta2 = DateTime.now();
   dynamic eta3 = DateTime.now();
@@ -53,7 +50,10 @@ class _ETAState extends State<ETA> {
               }
             } else {
               route1.dotStatus = const Color.fromRGBO(255, 0, 0, 1);
-              route1.nextStop = '-';
+              dynamic now = DateTime.now();
+              eta1 = now.add(
+                const Duration(seconds: 1),
+              );
             }
           },
         );
@@ -83,7 +83,10 @@ class _ETAState extends State<ETA> {
             } else {
               route2.dotStatus = const Color.fromRGBO(255, 0, 0, 1);
               route2.nextStop = '-';
-              eta2 = DateTime.now();
+              dynamic now = DateTime.now();
+              eta2 = now.add(
+                const Duration(seconds: 1),
+              );
             }
           },
         );
@@ -111,7 +114,10 @@ class _ETAState extends State<ETA> {
             } else {
               route3.dotStatus = const Color.fromRGBO(255, 0, 0, 1);
               route3.nextStop = '-';
-              eta3 = DateTime.now();
+              dynamic now = DateTime.now();
+              eta3 = now.add(
+                const Duration(seconds: 1),
+              );
             }
           },
         );
