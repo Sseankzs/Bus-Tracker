@@ -79,14 +79,16 @@ class _MyAppState extends State<MyApp> {
       };
       duration = 0;
       distance = 0;
-      scheduleData = null;
       polyline = null;
       if (positionStream != null) positionStream?.cancel();
     });
     if (positionStream != null) positionStream?.cancel();
     ref?.child("bus$currentTrackingBus").update({
       'operation': false,
+      'lat': scheduleData![0]['lat'],
+      'long': scheduleData![0]['long'],
     });
+    scheduleData = null;
     return;
   }
 

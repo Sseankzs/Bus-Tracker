@@ -9,8 +9,8 @@ class Schedule extends StatelessWidget {
   Widget build(BuildContext context) {
     // TO DO: Retrieve from firebase
     List<dynamic> busSchedule = [
-      {"title": "Internal Shuttle Bus", "image": "images/UTP_Bus Schedule_Internal.png", "route": 1},
-      {"title": "External Shuttle Bus (Seri Iskandar)", "image": "images/UTP_Bus Schedule_External.png", "route": 2},
+      {"title": "External Shuttle Bus (Seri Iskandar)", "image": "images/UTP_Bus Schedule_External.png", "route": 1},
+      {"title": "Internal Shuttle Bus", "image": "images/UTP_Bus Schedule_Internal.png", "route": 2},
       {"title": "External Shuttle Bus (Stn 18)", "image": "images/UTP_Bus Schedule_Shuttle Bus to Stn 18.png", "route": 3}
     ];
 
