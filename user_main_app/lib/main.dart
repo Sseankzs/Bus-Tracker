@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:user/eta.dart';
+import 'package:user/map.dart';
 import 'package:user/schedule.dart';
-import 'package:user/bus_track.dart';
 import 'package:geolocator/geolocator.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 void main() async {
+  // Ensure all binding initialized before runApp
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase app
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   runApp(const MyApp());
 
+  // Ensure permission granted
   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
   if (!serviceEnabled) {
     return;
   }
   LocationPermission permission = await Geolocator.checkPermission();
-  while (permission == LocationPermission.denied ||
-      permission == LocationPermission.deniedForever) {
+  while (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
     permission = await Geolocator.requestPermission();
   }
 }
@@ -51,7 +54,7 @@ class _LogInState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: const [ETA(), BusTrack(), Schedule()][currentpage],
+      body: const [ETA(), MapPage(), Schedule()][currentpage],
       bottomNavigationBar: NavigationBar(
         backgroundColor: const Color.fromRGBO(162, 123, 92, 1),
         animationDuration: const Duration(milliseconds: 500),

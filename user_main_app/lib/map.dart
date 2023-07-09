@@ -17,8 +17,6 @@ class MapPage extends StatefulWidget {
 class _MapsState extends State<MapPage> {
   late GoogleMapController mapController;
 
-  static const LatLng center = LatLng(4.3847634, 100.9708649);
-
   FirebaseDatabase database = FirebaseDatabase.instance;
   DatabaseReference? ref;
   StreamSubscription<DatabaseEvent>? positionStream;
@@ -30,6 +28,12 @@ class _MapsState extends State<MapPage> {
   double? latitude = 0.0;
   double? longitude = 0.0;
 
+  @override
+  void initState() {
+    addCustomIcon();
+    super.initState();
+  }
+
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     track(1);
@@ -37,16 +41,8 @@ class _MapsState extends State<MapPage> {
 
   BitmapDescriptor busIcon = BitmapDescriptor.defaultMarker;
 
-  @override
-  void initState() {
-    addCustomIcon();
-    super.initState();
-  }
-
   void addCustomIcon() {
-    BitmapDescriptor.fromAssetImage(
-            const ImageConfiguration(), "images/bus-32.png")
-        .then(
+    BitmapDescriptor.fromAssetImage(const ImageConfiguration(), "images/bus-48.png").then(
       (icon) {
         setState(() {
           busIcon = icon;
@@ -59,12 +55,12 @@ class _MapsState extends State<MapPage> {
   final Set<Marker> _markers = {};
 
   void track(int route) async {
-    setState(() {
-      currentTrackingRoute = route;
-      if (positionStream != null) positionStream?.cancel();
-      _polyline.clear();
-      _markers.clear();
-    });
+    currentTrackingRoute = route;
+    currentTrackingBus = 1;
+    currentTrackingSchedule = 1;
+    if (positionStream != null) positionStream?.cancel();
+    _polyline.clear();
+    _markers.clear();
 
     final ref = FirebaseDatabase.instance.ref('route$currentTrackingRoute');
 
@@ -136,28 +132,28 @@ class _MapsState extends State<MapPage> {
       if (lat.exists) {
         debugPrint(lat.value.toString());
       } else {
-        debugPrint('No data available.');
+        debugPrint('No lat data available.');
       }
       final long = await ref.child('bus$currentTrackingBus/long').get();
       if (long.exists) {
         debugPrint(long.value.toString());
       } else {
-        debugPrint('No data available.');
+        debugPrint('No long data available.');
       }
-      setState(() {
-        if (lat.value != null && long.value != null) {
-          latitude = double.parse(lat.value.toString());
-          longitude = double.parse(long.value.toString());
-          if (_markers.isNotEmpty) {
-            _markers.remove(_markers.last);
+      if (lat.value != null && long.value != null) {
+        latitude = double.parse(lat.value.toString());
+        longitude = double.parse(long.value.toString());
+        if (_markers.isNotEmpty) {
+          _markers.remove(_markers.last);
+          setState(() {
             _markers.add(Marker(
               markerId: const MarkerId("bus"),
               position: LatLng(latitude!, longitude!),
               icon: busIcon,
             ));
-          }
+          });
         }
-      });
+      }
     });
   }
 
@@ -179,24 +175,8 @@ class _MapsState extends State<MapPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text('BUS',
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22)),
-              Text(' ',
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22)),
-              Text('TRACK',
-                  style: TextStyle(
-                      color: Color.fromARGB(255, 162, 123, 92),
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22))
+              Text('BUS ', style: TextStyle(color: Colors.black, fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 22)),
+              Text('TRACK', style: TextStyle(color: Color.fromARGB(255, 162, 123, 92), fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 22))
             ],
           ),
         ),
@@ -206,7 +186,7 @@ class _MapsState extends State<MapPage> {
           polylines: _polyline,
           //markers: <Marker>{_createMarker()},
           initialCameraPosition: const CameraPosition(
-            target: center,
+            target: LatLng(4.3847634, 100.9708649),
             zoom: 16.0,
           ),
           myLocationEnabled: true,
@@ -221,19 +201,19 @@ class _MapsState extends State<MapPage> {
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
           renderOverlay: false,
-          animationDuration: const Duration(milliseconds: 500),
+          animationDuration: const Duration(milliseconds: 300),
           spacing: 20,
           children: [
             SpeedDialChild(
               child: const Icon(Icons.directions_bus),
-              label: 'Internal Route',
+              label: 'External Route',
               onTap: () {
                 track(1);
               }, // Set Action
             ),
             SpeedDialChild(
               child: const Icon(Icons.directions_bus),
-              label: 'External Route',
+              label: 'Internal Route',
               onTap: () {
                 track(2);
               }, // Set Action

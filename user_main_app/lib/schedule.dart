@@ -7,259 +7,80 @@ class Schedule extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TO DO: Retrieve from firebase
+    List<dynamic> busSchedule = [
+      {"title": "Internal Shuttle Bus", "image": "images/UTP_Bus Schedule_Internal.png", "route": 1},
+      {"title": "External Shuttle Bus (Seri Iskandar)", "image": "images/UTP_Bus Schedule_External.png", "route": 2},
+      {"title": "External Shuttle Bus (Stn 18)", "image": "images/UTP_Bus Schedule_Shuttle Bus to Stn 18.png", "route": 3}
+    ];
+
+    List<Widget> widgets = [];
+
+    //loop through schedule
+    for (var route in busSchedule) {
+      widgets.add(Container(
+        alignment: Alignment.topLeft,
+        padding: const EdgeInsets.fromLTRB(0, 20, 0, 1),
+        child: Text(
+          route["title"],
+          textAlign: TextAlign.left,
+          style: const TextStyle(fontSize: 12, fontFamily: 'Poppins'),
+        ),
+      ));
+      widgets.add(
+        Container(
+          padding: const EdgeInsets.fromLTRB(0, 5, 0, 20),
+          alignment: Alignment.center,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Center(
+              child: FullScreenWidget(
+                disposeLevel: DisposeLevel.Medium,
+                child: Center(
+                  child: ZoomOverlay(
+                    modalBarrierColor: Colors.black12,
+                    minScale: 0.5,
+                    maxScale: 3.0,
+                    animationCurve: Curves.fastOutSlowIn, // Defaults to fastOutSlowIn which mimics IOS instagram behavior
+                    animationDuration: const Duration(
+                        milliseconds:
+                            300), // Defaults to 100 Milliseconds. Recommended duration is 300 milliseconds for Curves.fastOutSlowIn// Defaults to false
+                    child: Hero(
+                      tag: route["title"],
+                      child: Image.asset(route["image"]),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     return SingleChildScrollView(
       child: Container(
+          padding: const EdgeInsets.fromLTRB(30, 50, 30, 0),
           color: const Color.fromRGBO(220, 215, 201, 1),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const SizedBox(height: 50),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                // Bus Schedule
-                children: [
-                  Text('       '),
-                  Text('Bus',
-                      style: TextStyle(
-                          color: Color.fromRGBO(63, 78, 79, 1),
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 36)),
-                  Text(' ',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 36)),
-                  Text('Schedule',
-                      style: TextStyle(
-                          color: Color.fromARGB(255, 162, 123, 92),
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 36))
-                ],
-              ),
-              const Row(
-                // This page displays ...
-                children: [
-                  Text('        '),
-                  Text('This page displays latest bus schedule.',
-                      style: TextStyle(
-                          color: Color.fromARGB(60, 0, 0, 0),
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.normal,
-                          fontSize: 10)),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // First Image Container________________________________  
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+            children: <Widget>[
                   const Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    // Bus Schedule
                     children: [
-                      Text('        '),
-                      Text('Internal Shuttle Bus',
-                          style: TextStyle(
-                              color: Color.fromARGB(150, 0, 0, 0),
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.normal,
-                              fontSize: 12)),
+                      Text('Bus ', style: TextStyle(color: Color.fromRGBO(63, 78, 79, 1), fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 36)),
+                      Text('Schedule',
+                          style: TextStyle(color: Color.fromARGB(255, 162, 123, 92), fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 36))
                     ],
                   ),
-                  Positioned(
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.fromLTRB(10, 5, 10, 20),
-                      child: Column(
-                        children: [
-                          Container(
-                              width: 500,
-                              height: 220,
-                              padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
-                              decoration: ShapeDecoration(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                shadows: const [
-                                  BoxShadow(
-                                      color: Colors.grey,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 4)),
-                                ],
-                                color: Colors.white,
-                              ),
-                              child: FullScreenWidget(
-                                disposeLevel: DisposeLevel.Medium,
-                                child: Center(
-                                  child: Hero(
-                                    tag: "smallImage",
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: ZoomOverlay(
-                                        modalBarrierColor: Colors.black12,
-                                        minScale: 0.5,
-                                        maxScale: 3.0,
-                                        animationCurve: Curves
-                                            .fastOutSlowIn, // Defaults to fastOutSlowIn which mimics IOS instagram behavior
-                                        animationDuration: const Duration(
-                                            milliseconds:
-                                                50), // Defaults to 100 Milliseconds. Recommended duration is 300 milliseconds for Curves.fastOutSlowIn
-                                        twoTouchOnly: true, // Defaults to false
-                                        child: Image.asset(
-                                            'images/UTP_Bus Schedule_Internal.png'),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )),
-                        ],
-                      ),
+                  Container(
+                    alignment: Alignment.topLeft,
+                    padding: const EdgeInsets.fromLTRB(0, 2, 0, 5),
+                    child: const Text(
+                      'This page displays latest bus schedule.',
                     ),
                   ),
-                ],
-              ),
-
-              // Second Image Container________________________________
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Row(
-                    children: [
-                      Text('        '),
-                      Text('External Shuttle Bus (Seri Iskandar)',
-                          style: TextStyle(
-                              color: Color.fromARGB(150, 0, 0, 0),
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.normal,
-                              fontSize: 12)),
-                    ],
-                  ),
-                  Positioned(
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.fromLTRB(10, 5, 10, 20),
-                      child: Column(
-                        children: [
-                          Container(
-                              width: 500,
-                              height: 270,
-                              padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
-                              decoration: ShapeDecoration(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                shadows: const [
-                                  BoxShadow(
-                                      color: Colors.grey,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 4)),
-                                ],
-                                color: Colors.white,
-                              ),
-                              child: FullScreenWidget(
-                                disposeLevel: DisposeLevel.Medium,
-                                child: Center(
-                                  child: Hero(
-                                    tag: "smallImage",
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: ZoomOverlay(
-                                        modalBarrierColor: Colors.black12,
-                                        minScale: 0.5,
-                                        maxScale: 3.0,
-                                        animationCurve: Curves
-                                            .fastOutSlowIn, // Defaults to fastOutSlowIn which mimics IOS instagram behavior
-                                        animationDuration: const Duration(
-                                            milliseconds:
-                                                50), // Defaults to 100 Milliseconds. Recommended duration is 300 milliseconds for Curves.fastOutSlowIn
-                                        twoTouchOnly: true, // Defaults to false
-                                        child: Image.asset(
-                                            'images/UTP_Bus Schedule_External.png'),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              // Third Image Container________________________________
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Row(
-                    children: [
-                      Text('        '),
-                      Text('External Shuttle Bus (Stn 18)',
-                          style: TextStyle(
-                              color: Color.fromARGB(150, 0, 0, 0),
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.normal,
-                              fontSize: 12)),
-                    ],
-                  ),
-                  Positioned(
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.fromLTRB(10, 5, 10, 20),
-                      child: Column(
-                        children: [
-                          Container(
-                              width: 500,
-                              height: 155,
-                              padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
-                              decoration: ShapeDecoration(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                shadows: const [
-                                  BoxShadow(
-                                      color: Colors.grey,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 4)),
-                                ],
-                                color: Colors.white,
-                              ),
-                              child: FullScreenWidget(
-                                disposeLevel: DisposeLevel.Medium,
-                                child: Center(
-                                  child: Hero(
-                                    tag: "smallImage",
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: ZoomOverlay(
-                                        modalBarrierColor: Colors.black12,
-                                        minScale: 0.5,
-                                        maxScale: 3.0,
-                                        animationCurve: Curves
-                                            .fastOutSlowIn, // Defaults to fastOutSlowIn which mimics IOS instagram behavior
-                                        animationDuration: const Duration(
-                                            milliseconds:
-                                                50), // Defaults to 100 Milliseconds. Recommended duration is 300 milliseconds for Curves.fastOutSlowIn
-                                        twoTouchOnly: true, // Defaults to false
-                                        child: Image.asset(
-                                            'images/UTP_Bus Schedule_Shuttle Bus to Stn 18.png'),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                ] +
+                widgets,
           )),
     );
   }

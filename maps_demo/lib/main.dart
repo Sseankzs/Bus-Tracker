@@ -77,36 +77,6 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  BitmapDescriptor? _markerIcon;
-
-  Marker _createMarker() {
-    if (_markerIcon != null) {
-      return Marker(
-        markerId: const MarkerId('marker_1'),
-        position: LatLng(latitude!, longitude!),
-        icon: _markerIcon!,
-      );
-    } else {
-      return Marker(
-        markerId: const MarkerId('marker_1'),
-        position: LatLng(latitude!, longitude!),
-      );
-    }
-  }
-
-  Future<void> _createMarkerImageFromAsset(BuildContext context) async {
-    if (_markerIcon == null) {
-      final ImageConfiguration imageConfiguration = createLocalImageConfiguration(context, size: const Size.square(8));
-      BitmapDescriptor.fromAssetImage(imageConfiguration, 'assets/bus-32.png').then(_updateBitmap);
-    }
-  }
-
-  void _updateBitmap(BitmapDescriptor bitmap) {
-    setState(() {
-      _markerIcon = bitmap;
-    });
-  }
-
   BitmapDescriptor markerIcon = BitmapDescriptor.defaultMarker;
   @override
   void initState() {
