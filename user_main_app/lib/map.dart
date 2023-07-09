@@ -42,11 +42,9 @@ class _MapsState extends State<MapPage> {
   BitmapDescriptor busIcon = BitmapDescriptor.defaultMarker;
 
   void addCustomIcon() {
-    BitmapDescriptor.fromAssetImage(const ImageConfiguration(), "images/bus-48.png").then(
+    BitmapDescriptor.fromAssetImage(const ImageConfiguration(), "images/bus-64.png").then(
       (icon) {
-        setState(() {
-          busIcon = icon;
-        });
+        busIcon = icon;
       },
     );
   }
@@ -73,25 +71,26 @@ class _MapsState extends State<MapPage> {
     if (polyline.exists && _polyline.isEmpty) {
       debugPrint(polyline.value.toString());
       PolylinePoints polylinePoints = PolylinePoints();
-      List<PointLatLng> latlng =
-          polylinePoints.decodePolyline(polyline.value.toString());
+      List<PointLatLng> latlng = polylinePoints.decodePolyline(polyline.value.toString());
       // convert List<PointLatLng> into List<LatLng>
       List<LatLng> points = [];
       for (var i = 0; i < latlng.length; i++) {
         points.add(LatLng(latlng[i].latitude, latlng[i].longitude));
       }
 
-      setState(() {
-        _polyline.clear();
-        _polyline.add(Polyline(
-          polylineId: const PolylineId('route'),
-          visible: true,
-          //latlng is List<LatLng>
-          points: points,
-          width: 5,
-          color: Colors.blue,
-        ));
-      });
+      if (mounted) {
+        setState(() {
+          _polyline.clear();
+          _polyline.add(Polyline(
+            polylineId: const PolylineId('route'),
+            visible: true,
+            //latlng is List<LatLng>
+            points: points,
+            width: 5,
+            color: Colors.blue,
+          ));
+        });
+      }
     } else {
       debugPrint('No polyline data available.');
     }
@@ -145,25 +144,31 @@ class _MapsState extends State<MapPage> {
         longitude = double.parse(long.value.toString());
         if (_markers.isNotEmpty) {
           _markers.remove(_markers.last);
-          setState(() {
-            _markers.add(Marker(
-              markerId: const MarkerId("bus"),
-              position: LatLng(latitude!, longitude!),
-              icon: busIcon,
-            ));
-          });
+          if (mounted) {
+            setState(() {
+              _markers.add(Marker(
+                markerId: const MarkerId("bus"),
+                position: LatLng(latitude!, longitude!),
+                icon: busIcon,
+              ));
+            });
+          }
         }
       }
     });
   }
 
   @override
+  void dispose() {
+    if (positionStream != null) positionStream?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (currentTrackingRoute != null) {
-      CameraPosition currentLocation =
-          CameraPosition(target: LatLng(latitude!, longitude!), zoom: 16);
-      mapController
-          .animateCamera(CameraUpdate.newCameraPosition(currentLocation));
+      CameraPosition currentLocation = CameraPosition(target: LatLng(latitude!, longitude!), zoom: 16);
+      mapController.animateCamera(CameraUpdate.newCameraPosition(currentLocation));
     }
     return Scaffold(
         appBar: AppBar(
@@ -194,9 +199,7 @@ class _MapsState extends State<MapPage> {
         ),
         // Floating Action Button
         floatingActionButton: SpeedDial(
-          label: const Text("Select Route",
-              style: TextStyle(
-                  color: Colors.black, fontFamily: 'Poppins', fontSize: 12)),
+          label: const Text("Select Route", style: TextStyle(color: Colors.black, fontFamily: 'Poppins', fontSize: 12)),
           animatedIcon: AnimatedIcons.menu_close,
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
