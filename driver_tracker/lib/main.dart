@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -53,11 +54,6 @@ class _MyAppState extends State<MyApp> {
   int? distance = 0;
   http.Response? polyline;
 
-  static const LocationSettings locationSettings = LocationSettings(
-    accuracy: LocationAccuracy.high,
-    distanceFilter: 100,
-  );
-
   StreamSubscription<Position>? positionStream;
 
   void stopTrack() {
@@ -82,13 +78,19 @@ class _MyAppState extends State<MyApp> {
       polyline = null;
       if (positionStream != null) positionStream?.cancel();
     });
-    if (positionStream != null) positionStream?.cancel();
     ref?.child("bus$currentTrackingBus").update({
       'operation': false,
-      'lat': scheduleData![0]['lat'],
-      'long': scheduleData![0]['long'],
     });
-    scheduleData = null;
+    if (scheduleData != null) {
+      ref?.child("bus$currentTrackingBus").update({
+        'lat': scheduleData![0]['lat'],
+        'long': scheduleData![0]['long'],
+      });
+    }
+    setState(() {
+      scheduleData = null;
+    });
+    if (positionStream != null) positionStream?.cancel();
     return;
   }
 
@@ -113,6 +115,28 @@ class _MyAppState extends State<MyApp> {
       currentTrackingRoute = route;
       ref = FirebaseDatabase.instance.ref('route$currentTrackingRoute');
     });
+
+    late LocationSettings locationSettings;
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      locationSettings = AndroidSettings(
+          accuracy: LocationAccuracy.best,
+          distanceFilter: 10,
+          forceLocationManager: true,
+          //intervalDuration: const Duration(seconds: 5),
+          //(Optional) Set foreground notification config to keep the app alive
+          //when going to the background
+          foregroundNotificationConfig: const ForegroundNotificationConfig(
+            notificationText: "Location will continue be recorded in the background until you stop the tracking.",
+            notificationTitle: "UBusTrack Background Services",
+            enableWakeLock: true,
+          ));
+    } else {
+      locationSettings = const LocationSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 10,
+      );
+    }
 
     // Start tracking
     positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) async {

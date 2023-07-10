@@ -204,7 +204,6 @@ class _MapsState extends State<MapPage> {
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
           renderOverlay: false,
-          animationDuration: const Duration(milliseconds: 300),
           spacing: 20,
           children: [
             SpeedDialChild(

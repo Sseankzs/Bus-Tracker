@@ -1,10 +1,6 @@
-import 'dart:async';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:user/route_details.dart';
 import 'package:intl/intl.dart';
-import 'package:printing/printing.dart';
 
 class ETA extends StatefulWidget {
   const ETA({super.key});
@@ -14,13 +10,9 @@ class ETA extends StatefulWidget {
 }
 
 class _ETAState extends State<ETA> {
-  final _database = FirebaseDatabase.instance.ref();
-  late Details route3;
-  late Details route1;
-  late Details route2;
-  dynamic eta1 = DateTime.now();
-  dynamic eta2 = DateTime.now();
-  dynamic eta3 = DateTime.now();
+  int nextStopNum = 0;
+  String nextStop = '-';
+  DatabaseReference? _database;
 
   @override
   void initState() {
@@ -28,101 +20,126 @@ class _ETAState extends State<ETA> {
     _activateListeners();
   }
 
-  void _activateListeners() {
-    _database.child('route1/bus1').onValue.listen(
-      (event) {
-        final data = Map<String, dynamic>.from(event.snapshot.value as dynamic);
-        route1 = Details.fromBusDB(data);
-        setState(
-          () {
-            if (route1.operating == true) {
-              dynamic now = DateTime.now();
+  // TO DO: Retrieve from firebase
+  List<dynamic> busSchedule = [
+    {"title": "Internal Shuttle Bus", "image": "images/UTP_Bus Schedule_Internal.png", "route": 1},
+    {"title": "External Shuttle Bus (Seri Iskandar)", "image": "images/UTP_Bus Schedule_External.png", "route": 2},
+    {"title": "External Shuttle Bus (Stn 18)", "image": "images/UTP_Bus Schedule_Shuttle Bus to Stn 18.png", "route": 3}
+  ];
 
-              route1.dotStatus = const Color.fromRGBO(0, 255, 0, 1);
-              eta1 = now.add(
-                Duration(seconds: route1.seconds),
-              );
-              if (route1.nextStopNum == 0) {
-                route1.nextStop = 'PMMD';
-              } else if (route1.nextStopNum == 1) {
-                route1.nextStop = 'Lotus Seri Ikandar';
-              } else if (route1.nextStopNum == 2) {
-                route1.nextStop = 'Seri Iskandar Bus Stn';
-              } else if (route1.nextStopNum == 3) {
-                route1.nextStop = 'PMMD';
-              }
-            } else {
-              route1.dotStatus = const Color.fromRGBO(255, 0, 0, 1);
-              route1.nextStop = '-';
-            }
-          },
-        );
-      },
-    );
-    _database.child('route2/bus1').onValue.listen(
-      (event) {
-        final data = Map<String, dynamic>.from(event.snapshot.value as dynamic);
-        route2 = Details.fromBusDB(data);
-        setState(
-          () {
-            if (route2.operating == true) {
-              dynamic now = DateTime.now();
-              route2.dotStatus = const Color.fromRGBO(0, 255, 0, 1);
-              eta2 = now.add(
-                Duration(seconds: route2.seconds),
-              );
-              if (route2.nextStopNum == 0) {
-                route2.nextStop = 'PMMD';
-              } else if (route2.nextStopNum == 1) {
-                route2.nextStop = 'An-Nur Mosque';
-              } else if (route2.nextStopNum == 2) {
-                route2.nextStop = 'Chancellor Complex';
-              } else if (route2.nextStopNum == 3) {
-                route2.nextStop = 'R&D';
-              }
-            } else {
-              route2.dotStatus = const Color.fromRGBO(255, 0, 0, 1);
-              route2.nextStop = '-';
-              eta2 = DateTime.now();
-            }
-          },
-        );
-      },
-    );
-    _database.child('route3/bus1').onValue.listen(
-      (event) {
-        final data = Map<String, dynamic>.from(event.snapshot.value as dynamic);
-        route3 = Details.fromBusDB(data);
-        setState(
-          () {
-            if (route3.operating == true) {
-              dynamic now = DateTime.now();
-              route3.dotStatus = const Color.fromRGBO(0, 255, 0, 1);
-              eta3 = now.add(
-                Duration(seconds: route3.seconds),
-              );
-              if (route3.nextStopNum == 0) {
-                route3.nextStop = 'PMMD';
-              } else if (route3.nextStopNum == 1) {
-                route3.nextStop = 'Aeon Station 18';
-              } else if (route3.nextStopNum == 2) {
-                route3.nextStop = 'PMMD';
-              }
-            } else {
-              route3.dotStatus = const Color.fromRGBO(255, 0, 0, 1);
-              route3.nextStop = '-';
-              eta3 = DateTime.now();
-            }
-          },
-        );
-      },
-    );
+  List data = [];
+
+  void _activateListeners() {
+    _database = FirebaseDatabase.instance.ref();
+
+    for (var route in busSchedule) {
+      data.add({'listen': null, 'operation': false, 'nextStopName': '-', 'duration': '-'});
+      int id = route['route'];
+      data[id - 1]['listen'] = _database?.child('route$id').onValue.listen(
+        (event) async {
+          final operation = await _database?.child('route$id/bus1/operation').get();
+          debugPrint("Route $id: ${operation!.value}");
+          if (bool.parse(operation.value.toString())) {
+            final nextStop = await _database?.child('route$id/bus1/nextStop').get();
+            final nextStopName = await _database?.child('route$id/schedule1/${nextStop!.value}/name').get();
+
+            final duration = await _database?.child('route$id/bus1/duration').get();
+
+            data[id - 1]['nextStopName'] = nextStopName!.value.toString();
+            data[id - 1]['duration'] = int.parse(duration!.value.toString());
+          } else {
+            data[id - 1]['nextStopName'] = '-';
+            data[id - 1]['duration'] = '-';
+          }
+
+          setState(() {
+            data[id - 1]['operation'] = bool.parse(operation.value.toString());
+          });
+
+          debugPrint("Route $id: ${data[id - 1]}");
+        },
+      );
+    }
   }
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
+    List<Widget> widgets = [];
+
+    for (var route in busSchedule) {
+      int id = route['route'];
+
+      String time;
+      if (data[id - 1]['duration'] != '-') {
+        final now = DateTime.now();
+        final later = now.add(Duration(seconds: data[id - 1]['duration']));
+        time = DateFormat.jm().format(later);
+      } else {
+        time = 'Offline';
+      }
+
+      widgets.add(Container(
+        alignment: Alignment.topLeft,
+        padding: const EdgeInsets.fromLTRB(0, 20, 0, 1),
+        child: Text(
+          route["title"],
+          textAlign: TextAlign.left,
+          style: const TextStyle(fontSize: 12, fontFamily: 'Poppins'),
+        ),
+      ));
+
+      widgets.add(Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.fromLTRB(0, 5, 0, 20),
+        child: Container(
+            height: 50,
+            padding: const EdgeInsets.fromLTRB(15, 1, 15, 1),
+            decoration: ShapeDecoration(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              shadows: const [
+                BoxShadow(color: Colors.grey, blurRadius: 4, offset: Offset(0, 4)),
+              ],
+              color: Colors.white,
+            ),
+            child: LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+              return ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.circle_rounded,
+                      size: 15,
+                      color: data[id - 1]['operation'] ? Colors.green : Colors.red,
+                    ),
+                    const SizedBox(width: 5),
+                    SizedBox(
+                      width: constraints.maxWidth - 100,
+                      child: Text(
+                        'Next Stop:  ${data[id - 1]['nextStopName']}',
+                        textAlign: TextAlign.left,
+                        style: const TextStyle(fontSize: 15),
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          time,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            })),
+      ));
+    }
+
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints viewportConstraints) {
         return SingleChildScrollView(
@@ -134,9 +151,7 @@ class _ETAState extends State<ETA> {
               padding: const EdgeInsets.fromLTRB(30, 50, 30, 0),
               color: const Color.fromRGBO(220, 215, 201, 1),
               child: Column(
-                children: [
-                  Column(
-                    children: [
+                children: <Widget>[
                       Container(
                         alignment: Alignment.topLeft,
                         child: const Text.rich(
@@ -171,7 +186,6 @@ class _ETAState extends State<ETA> {
                           'This page displays updated status of each route',
                         ),
                       ),
-
                       Container(
                         alignment: Alignment.topLeft,
                         padding: const EdgeInsets.fromLTRB(0, 20, 0, 1),
@@ -186,174 +200,8 @@ class _ETAState extends State<ETA> {
                           ),
                         ),
                       ),
-
-                      Container(
-                        alignment: Alignment.topLeft,
-                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 1),
-                        child: const Text(
-                          'Internal Shuttle Bus',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(fontSize: 12, fontFamily: 'Poppins'),
-                        ),
-                      ),
-
-                      //First Container
-                      Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 20),
-                        child: Container(
-                            height: 50,
-                            padding: const EdgeInsets.fromLTRB(15, 1, 15, 1),
-                            decoration: ShapeDecoration(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              shadows: const [
-                                BoxShadow(
-                                    color: Colors.grey,
-                                    blurRadius: 4,
-                                    offset: Offset(0, 4)),
-                              ],
-                              color: Colors.white,
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.circle_rounded,
-                                  size: 15,
-                                  color: route2.dotStatus,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Next Stop:  ${route2.nextStop}',
-                                  textAlign: TextAlign.left,
-                                  style: const TextStyle(fontSize: 15),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    alignment: Alignment.centerRight,
-                                    child: Text(
-                                      'ETA : ${DateFormat.jm().format(eta2)}',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )),
-                      ),
-                      Container(
-                        alignment: Alignment.topLeft,
-                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 1),
-                        child: const Text(
-                          'External Shuttle Bus (Seri Iskandar)',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(fontSize: 12, fontFamily: 'Poppins'),
-                        ),
-                      ),
-                      //Second Container
-                      Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 20),
-                        child: Container(
-                            height: 50,
-                            padding: const EdgeInsets.fromLTRB(15, 1, 15, 1),
-                            decoration: ShapeDecoration(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              shadows: const [
-                                BoxShadow(
-                                    color: Colors.grey,
-                                    blurRadius: 4,
-                                    offset: Offset(0, 4)),
-                              ],
-                              color: Colors.white,
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.circle_rounded,
-                                  size: 15,
-                                  color: route1.dotStatus,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Next Stop: ${route1.nextStop}',
-                                  textAlign: TextAlign.left,
-                                  style: const TextStyle(fontSize: 15),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    alignment: Alignment.centerRight,
-                                    child: Text(
-                                      'ETA: ${DateFormat.jm().format(eta1)}',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )),
-                      ),
-                      Container(
-                        alignment: Alignment.topLeft,
-                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 1),
-                        child: const Text(
-                          'External Shuttle Bus (Stn 18)',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(fontSize: 12, fontFamily: 'Poppins'),
-                        ),
-                      ),
-                      //Third Container
-                      Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 20),
-                        child: Container(
-                          height: 50,
-                          padding: const EdgeInsets.fromLTRB(15, 1, 15, 1),
-                          decoration: ShapeDecoration(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            shadows: const [
-                              BoxShadow(
-                                  color: Colors.grey,
-                                  blurRadius: 4,
-                                  offset: Offset(0, 4)),
-                            ],
-                            color: Colors.white,
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.circle_rounded,
-                                size: 15,
-                                color: route3.dotStatus,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Next Stop: ${route3.nextStop}',
-                                textAlign: TextAlign.left,
-                                style: const TextStyle(fontSize: 15),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  alignment: Alignment.centerRight,
-                                  child: Text(
-                                    'ETA ${DateFormat.jm().format(eta3)}',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                    ] +
+                    widgets,
               ),
             ),
           ),

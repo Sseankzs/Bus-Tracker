@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:full_screen_image/full_screen_image.dart';
-import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
+import 'package:widget_zoom/widget_zoom.dart';
 
 class Schedule extends StatelessWidget {
   const Schedule({super.key});
@@ -20,46 +19,31 @@ class Schedule extends StatelessWidget {
     for (var route in busSchedule) {
       widgets.add(Container(
         alignment: Alignment.topLeft,
-        padding: const EdgeInsets.fromLTRB(0, 20, 0, 1),
+        padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
         child: Text(
           route["title"],
           textAlign: TextAlign.left,
-          style: const TextStyle(fontSize: 12, fontFamily: 'Poppins'),
+          style: const TextStyle(fontSize: 15, fontFamily: 'Poppins'),
         ),
       ));
       widgets.add(
         Container(
-          padding: const EdgeInsets.fromLTRB(0, 5, 0, 20),
+          padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
           alignment: Alignment.center,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: Center(
-              child: FullScreenWidget(
-                disposeLevel: DisposeLevel.Medium,
-                child: Center(
-                  child: ZoomOverlay(
-                    modalBarrierColor: Colors.black12,
-                    minScale: 0.5,
-                    maxScale: 3.0,
-                    animationCurve: Curves.fastOutSlowIn, // Defaults to fastOutSlowIn which mimics IOS instagram behavior
-                    animationDuration: const Duration(
-                        milliseconds:
-                            300), // Defaults to 100 Milliseconds. Recommended duration is 300 milliseconds for Curves.fastOutSlowIn// Defaults to false
-                    child: Hero(
-                      tag: route["title"],
-                      child: Image.asset(route["image"]),
-                    ),
-                  ),
-                ),
-              ),
+            child: WidgetZoom(
+              heroAnimationTag: route["title"],
+              zoomWidget: Image.asset(route["image"]),
             ),
           ),
         ),
       );
     }
+
     return SingleChildScrollView(
       child: Container(
-          padding: const EdgeInsets.fromLTRB(30, 50, 30, 0),
+          padding: const EdgeInsets.fromLTRB(30, 50, 30, 30),
           color: const Color.fromRGBO(220, 215, 201, 1),
           child: Column(
             children: <Widget>[
@@ -71,13 +55,6 @@ class Schedule extends StatelessWidget {
                       Text('Schedule',
                           style: TextStyle(color: Color.fromARGB(255, 162, 123, 92), fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 36))
                     ],
-                  ),
-                  Container(
-                    alignment: Alignment.topLeft,
-                    padding: const EdgeInsets.fromLTRB(0, 2, 0, 5),
-                    child: const Text(
-                      'This page displays latest bus schedule.',
-                    ),
                   ),
                 ] +
                 widgets,
